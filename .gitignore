@@ -3,6 +3,7 @@
 # Python
 *.pyc
 .python-version
+*.egg-info/
 
 # Man pages
 /bkpmgmt.?
