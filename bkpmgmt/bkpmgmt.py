@@ -11,6 +11,10 @@ LOG.setLevel(logging.WARN)
 
 
 def main():
+    """Main function.
+    Manage cli arguments and call the corresponding function per subcommand
+    with the needed arguments.
+    """
     parser = argparse.ArgumentParser(
         formatter_class=argparse.RawDescriptionHelpFormatter,
         description="""\
@@ -75,6 +79,12 @@ def main():
 
 
 def new(customer, server, size):
+    """Create a new customer or a new server.
+
+    :param string customer: Customer name.
+    :param string server:   Server hostname and dirvish vault name.
+    :param string size:     Quota for this customer or server.
+    """
     if not customer:
         LOG.error('Customer is needed')
         sys.exit(1)
@@ -89,6 +99,12 @@ def new(customer, server, size):
 
 
 def resize(customer, server, size):
+    """Resize an existing customer or server.
+
+    :param string customer: Customer name.
+    :param string server:   Server hostname and dirvish vault name.
+    :param string size:     Quota for this customer or server.
+    """
     if not customer:
         LOG.error('Customer is needed')
         sys.exit(1)
@@ -103,6 +119,11 @@ def resize(customer, server, size):
 
 
 def remove(customer, server):
+    """Remove a customer or server.
+
+    :param string customer: Customer name.
+    :param string server:   Server hostname and dirvish vault name.
+    """
     if not customer:
         LOG.error('Customer is needed')
         sys.exit(1)
@@ -114,6 +135,8 @@ def remove(customer, server):
 
 
 def log():
+    """Manage the command log.
+    """
     sys.exit(0)
 
 
