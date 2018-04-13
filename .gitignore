@@ -5,5 +5,9 @@
 .python-version
 *.egg-info/
 
+# Python build
+/dist/
+/build/
+
 # Man pages
 /bkpmgmt.?
