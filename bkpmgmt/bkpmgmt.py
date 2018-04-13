@@ -2,8 +2,20 @@
 # -*- coding: utf-8 -*-
 
 import argparse
+import configparser
 import logging
+import os
 import sys
+
+from bkpmgmt import history
+
+CONFIG_USER = '~/.config/bkpmgmt.ini'
+CONFIG_SYSTEM = '/etc/bkpmgmt.ini'
+
+CONFIG = configparser.ConfigParser()
+CONFIG['database'] = {
+    'path': '/var/lib/bkpmgmt.db',
+}
 
 LOG = logging.getLogger(__name__)
 LOG.addHandler(logging.StreamHandler())
@@ -65,14 +77,41 @@ def main():
     )
     args = parser.parse_args()
 
+    global CONFIG
+    try:
+        CONFIG.read_file(open(os.path.expanduser(CONFIG_USER)))
+    except FileNotFoundError as e:
+        try:
+            CONFIG.read_file(open(CONFIG_SYSTEM))
+        except FileNotFoundError as e:
+            with open(os.path.expanduser(CONFIG_USER), 'w') as configfile:
+                CONFIG.write(configfile)
+            LOG.warn('New configuration written to {0}'.format(CONFIG_USER))
+
+    hist = history.History(CONFIG['database']['path'])
+
     if args.command == 'new':
-        new(args.customer, args.vault, args.size)
+        new(
+            hist,
+            args.customer,
+            args.vault,
+            args.size,
+        )
     elif args.command == 'resize':
-        resize(args.customer, args.vault, args.size)
+        resize(
+            hist,
+            args.customer,
+            args.vault,
+            args.size,
+        )
     elif args.command == 'remove':
-        remove(args.customer, args.vault)
+        remove(
+            hist,
+            args.customer,
+            args.vault,
+        )
     elif args.command == 'log':
-        log()
+        history_show(hist)
     else:
         sys.exit(1)
     sys.exit(0)
@@ -131,10 +170,11 @@ def remove(customer, vault):
         remove_vault(customer, vault)
 
 
-def log():
+def history_show(history):
     """Manage the command log.
     """
-    sys.exit(0)
+    for row in history.show():
+        print(row)
 
 
 if __name__ == '__main__':
