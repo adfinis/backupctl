@@ -4,6 +4,8 @@
 *.pyc
 .python-version
 *.egg-info/
+.pytest_cache/
+.coverage
 
 # Python build
 /dist/
