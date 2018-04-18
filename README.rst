@@ -42,17 +42,17 @@ COMMANDS
 ========
 All subcommands that modify zfs volumes and dirvish configurations.
 
-new -n customer [-c server] [-s size]
--------------------------------------
+new -n customer [-v server/vault] [-s size]
+-------------------------------------------
 Create a new customer zfs volume or a new dirvish vault inside a customer.
 
-resize -n customer [-c server] -s size
---------------------------------------
+resize -n customer [-v server/vault] -s size
+--------------------------------------------
 Resize an existing customer zfs volume or dirvish vault inside a customer.
 Shrinking is supported too.
 
-remove -n customer [-c server]
-------------------------------
+remove -n customer [-v server/vault]
+------------------------------------
 Remove an existing customer zfs volume or dirvish vault inside a customer.
 If removing a customer, all dirvish vaults inside this customer will be removed
 too.
@@ -65,7 +65,7 @@ Show the history of generating, resizing and removing customers and servers.
 OPTIONS
 =======
 
--c, --client            Specify the hostname of the dirvish vault name.
+-v, --vault             Specify the hostname of the dirvish vault name.
 --dirvish-client        Specify a client ip or fqdn to back up. Needed if
                         different from option client.
 -h, --help              Show this help message and exit.
@@ -96,30 +96,31 @@ Remove a customer with all his servers. All data will be lost.
 SERVER MANAGEMENT
 -----------------
 
-Create a new server www.example.com for customer1 with no special quota (it
-will inherit the quota of the customer).
+Create a new server/vault www.example.com for customer1 with no special quota
+(it will inherit the quota of the customer).
 
-  bkpmgmt new -n customer1 -h www.example.com
+  bkpmgmt new -n customer1 -v www.example.com
 
-Create a new server www.example.com for customer1 with a quota of 10G. Data
-inside this server will also count on the customer level).
+Create a new server/vault www.example.com for customer1 with a quota of 10G.
+Data inside this server will also count on the customer level).
 
-  bkpmgmt new -n customer1 -h www.example.com -s 10G
+  bkpmgmt new -n customer1 -v www.example.com -s 10G
 
-Create a new server www.example.com which isn't directly accessible, so a
+Create a new server/vault www.example.com which isn't directly accessible, so a
 special dirvish client is needed, in this case the server is reachable with the
 ip address 192.0.2.100.
 
-  bkpmgmt new -n customer1 -h www.example.com -s 10G --dirvish-client 192.0.2.100
+  bkpmgmt new -n customer1 -v www.example.com -s 10G --dirvish-client 192.0.2.100
 
-Resize the quota of the server www.example.com of customer1 to the size of 20G.
+Resize the quota of the server/vault www.example.com of customer1 to the size
+of 20G.
 
-  bkpmgmt resize -n customer1 -h www.example.com -s 20G
+  bkpmgmt resize -n customer1 -v www.example.com -s 20G
 
-Remove the server www.example.com of customer1, this will delete all the backups
-and also the dirvish configuration for this server.
+Remove the server/vault www.example.com of customer1, this will delete all the
+backups and also the dirvish configuration for this server.
 
-  bkpmgmt remove -n customer1 -h www.example.com
+  bkpmgmt remove -n customer1 -v www.example.com
 
 
 SEE ALSO

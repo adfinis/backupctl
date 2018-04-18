@@ -29,11 +29,11 @@ def main():
         """,
     )
     parser.add_argument(
-        "-c", "--server",
+        "-v", "--vault",
         required=False,
         default=None,
         help="""\
-        Hostname and dirvish vault name of the server to backup.
+        Dirvish vault name or server hostname to backup.
         Use a fully qualified domain name for that.
         """,
     )
@@ -42,8 +42,8 @@ def main():
         required=False,
         default=None,
         help="""\
-        Specify a client ip or fqdn to back up. Needed if different from
-        option client.
+        Specify an ip address or fqdn for a dirvish vault to back up.
+        Needed if different from option vault.
         """,
     )
     parser.add_argument(
@@ -59,18 +59,18 @@ def main():
         required=False,
         default=None,
         help="""\
-        Quota of a customer or a server. Size can be written human readable as
+        Quota of a customer or a vault. Size can be written human readable as
         MB, GB and so on.
         """,
     )
     args = parser.parse_args()
 
     if args.command == 'new':
-        new(args.customer, args.server, args.size)
+        new(args.customer, args.vault, args.size)
     elif args.command == 'resize':
-        resize(args.customer, args.server, args.size)
+        resize(args.customer, args.vault, args.size)
     elif args.command == 'remove':
-        remove(args.customer, args.server)
+        remove(args.customer, args.vault)
     elif args.command == 'log':
         log()
     else:
@@ -78,32 +78,32 @@ def main():
     sys.exit(0)
 
 
-def new(customer, server, size):
-    """Create a new customer or a new server.
+def new(customer, vault, size):
+    """Create a new customer or a new vault/server.
 
     :param string customer: Customer name.
-    :param string server:   Server hostname and dirvish vault name.
-    :param string size:     Quota for this customer or server.
+    :param string vault:    Vault name or server hostname.
+    :param string size:     Quota for this customer or vault.
     """
     if not customer:
         LOG.error('Customer is needed')
         sys.exit(1)
-    if not server and not size:
-        LOG.error('If no server is given, a size is required')
+    if not vault and not size:
+        LOG.error('If no vault is given, a size is required')
         sys.exit(1)
-    if not server:
+    if not vault:
         new_customer(customer, size)
     else:
-        new_server(customer, server, size)
+        new_vault(customer, vault, size)
     sys.exit(0)
 
 
-def resize(customer, server, size):
-    """Resize an existing customer or server.
+def resize(customer, vault, size):
+    """Resize an existing customer or vault.
 
     :param string customer: Customer name.
-    :param string server:   Server hostname and dirvish vault name.
-    :param string size:     Quota for this customer or server.
+    :param string vault:    Vault name or server hostname.
+    :param string size:     Quota for this customer or vault.
     """
     if not customer:
         LOG.error('Customer is needed')
@@ -111,26 +111,26 @@ def resize(customer, server, size):
     if not size:
         LOG.error('A size is required')
         sys.exit(1)
-    if not server:
+    if not vault:
         resize_customer(customer, size)
     else:
-        resize_server(customer, server, size)
+        resize_vault(customer, vault, size)
     sys.exit(0)
 
 
-def remove(customer, server):
-    """Remove a customer or server.
+def remove(customer, vault):
+    """Remove a customer or vault.
 
     :param string customer: Customer name.
-    :param string server:   Server hostname and dirvish vault name.
+    :param string vault:    Vault name or server hostname.
     """
     if not customer:
         LOG.error('Customer is needed')
         sys.exit(1)
-    if not server:
+    if not vault:
         remove_customer(customer)
     else:
-        remove_server(customer, server)
+        remove_vault(customer, vault)
     sys.exit(0)
 
 
