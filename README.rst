@@ -83,15 +83,15 @@ CUSTOMER MANAGEMENT
 
 Create a new customer with a quota of 10G.
 
-  bkpmgmt new customer1 10G
+  bkpmgmt new -n customer1 -s 10G
 
 Resize the quota of an existing customer to 20G.
 
-  bkpmgmt resize customer1 20G
+  bkpmgmt resize -n customer1 -s 20G
 
 Remove a customer with all his servers. All data will be lost.
 
-  bkpmgmt remove customer1
+  bkpmgmt remove -n customer1
 
 SERVER MANAGEMENT
 -----------------
