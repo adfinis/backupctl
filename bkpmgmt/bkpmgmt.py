@@ -5,6 +5,7 @@ import argparse
 import configparser
 import logging
 import os
+import sqlite3
 import sys
 
 from bkpmgmt import history
@@ -88,7 +89,13 @@ def main():
                 CONFIG.write(configfile)
             LOG.warn('New configuration written to {0}'.format(CONFIG_USER))
 
-    hist = history.History(CONFIG['database']['path'])
+    try:
+        hist = history.History(CONFIG['database']['path'])
+    except sqlite3.OperationalError as e:
+        LOG.error("Couldn't open database {0}. Exit now.".format(
+            CONFIG['database']['path'],
+        ))
+        sys.exit(1)
 
     if args.command == 'new':
         new(
