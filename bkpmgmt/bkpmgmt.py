@@ -95,7 +95,6 @@ def new(customer, vault, size):
         new_customer(customer, size)
     else:
         new_vault(customer, vault, size)
-    sys.exit(0)
 
 
 def resize(customer, vault, size):
@@ -115,7 +114,6 @@ def resize(customer, vault, size):
         resize_customer(customer, size)
     else:
         resize_vault(customer, vault, size)
-    sys.exit(0)
 
 
 def remove(customer, vault):
@@ -131,7 +129,6 @@ def remove(customer, vault):
         remove_customer(customer)
     else:
         remove_vault(customer, vault)
-    sys.exit(0)
 
 
 def log():
