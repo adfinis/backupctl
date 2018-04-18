@@ -12,6 +12,8 @@ class History:
     """Store and show history of commands done with the bkpmgmt tool.
 
     :ivar string dbpath: Path to the history database.
+
+    :raises sqlite3.OperationalError: if couldn't open the database.
     """
 
     def __init__(self, dbpath):
@@ -35,7 +37,7 @@ class History:
                 )
             ;'''
         )
-        self._conn.close()
+        self._conn.commit()
 
     def add(self, customer, command, vault=None, size=None):
         """Add an entry to the history.
@@ -48,13 +50,9 @@ class History:
         :returns: True
         :rtype: bool
 
-        :raises sqlite3.OperationalError: if something with the database goes
-        wrong.
+        :raises sqlite3.OperationalError: if database schematic is wrong or
+        database is not writtable.
         """
-        self._conn = sqlite3.connect(self._path)
-        logger.debug(
-            "Opened database {0} successfully".format(self._path)
-        )
         self._conn.execute(
             '''INSERT INTO history
                 (
@@ -80,8 +78,6 @@ class History:
             )
         )
         self._conn.commit()
-        logger.debug("Close database {0}".format(self._path))
-        self._conn.close()
         return True
 
     def show(self, count=20):
@@ -92,13 +88,9 @@ class History:
         :returns: A list of entries.
         :rtype: `list` of `string`
 
-        :raises sqlite3.OperationalError: if something with the database goes
-        wrong.
+        :raises sqlite3.OperationalError: if database schematic is wrong or
+        database is not readable.
         """
-        self._conn = sqlite3.connect(self._path)
-        logger.debug(
-            "Opened database {0} successfully".format(self._path)
-        )
         history_list = []
         cur = self._conn.cursor()
         cur.execute(
@@ -129,6 +121,4 @@ class History:
                     size,
                 )
             )
-        logger.debug("Close database {0}".format(self._path))
-        self._conn.close()
         return history_list
