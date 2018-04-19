@@ -17,6 +17,9 @@ CONFIG = configparser.ConfigParser()
 CONFIG['database'] = {
     'path': '/var/lib/bkpmgmt.db',
 }
+CONFIG['zfs'] = {
+    'pool': 'backup',
+}
 
 LOG = logging.getLogger(__name__)
 LOG.addHandler(logging.StreamHandler())
