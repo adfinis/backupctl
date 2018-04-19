@@ -5,6 +5,24 @@ python:
   - 3.5
   - 3.6
 
+sudo: true
+
+addons:
+  apt:
+    packages:
+      - zfs-fuse
+
+before_install:
+  - sudo zfs-fuse &
+  - sudo chmod 711 /var/run/zfs
+  - sudo chmod 770 /var/run/zfs/zfs_socket
+  - sudo chgrp $(id -g) /var/run/zfs/zfs_socket
+  - sudo mkdir -m 0755 /backup
+  - sudo chown $(id -u):$(id -g) /backup
+  - truncate -s 1G "${PWD}/ram_disk_1"
+  - zpool create backup "${PWD}/ram_disk_1"
+  - zpool list backup
+
 install:
   - pip install .
   - pip install -r requirements.txt
