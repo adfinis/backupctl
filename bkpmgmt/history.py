@@ -4,7 +4,6 @@
 import logging
 import sqlite3
 
-
 logger = logging.getLogger(__name__)
 
 
