@@ -40,7 +40,7 @@ def main():
     parser.add_argument(
         "command",
         help="""\
-        All subcommands that modify zfs volumes and dirvish configurations.
+        All subcommands that modify zfs file system and dirvish configurations.
         See the manpage (man 8 bkpmgmt) for more inforation.
         """,
     )
