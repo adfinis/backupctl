@@ -24,7 +24,9 @@ setup(
     author_email='https://www.adfinis-sygroup.ch/',
     description='Manage dirvish backups with an underlying zfs storage pool.',
     long_description=README_TEXT,
-    install_requires=(),
+    install_requires=(
+        'jinja2',
+    ),
     keywords='dirvish, zfs',
     url='https://www.adfinis-sygroup.ch/',
     packages=find_packages(),
