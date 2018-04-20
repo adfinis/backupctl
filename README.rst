@@ -123,6 +123,37 @@ backups and also the dirvish configuration for this server.
   bkpmgmt remove -n customer1 -v www.example.com
 
 
+EXIT STATUS
+===========
+The following exit values are returned:
+
+0
+--
+Successful completion.
+
+1
+--
+An error occurred.
+
+
+FILES
+=====
+
+/etc/bkpmgmt.ini
+----------------
+System-wide configuration file.
+
+~/.config/bkpmgmt.ini
+---------------------
+User specific configuration file. Will only be read if system-wide
+configuration doesn't exist. If it doesn't exist it will be created with
+default values.
+
+/var/lib/bkpmgmt.db
+-------------------
+Bkpmgmt history database. This is an sqlite3 database.
+
+
 SEE ALSO
 ========
 
