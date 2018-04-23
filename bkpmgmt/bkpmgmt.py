@@ -8,7 +8,7 @@ import os
 import sqlite3
 import sys
 
-from bkpmgmt import history
+from bkpmgmt import dirvish, history, zfs
 
 CONFIG_USER = '~/.config/bkpmgmt.ini'
 CONFIG_SYSTEM = '/etc/bkpmgmt.ini'
@@ -90,6 +90,7 @@ def main():
             args.customer,
             args.vault,
             args.size,
+            args.dirvish_client,
         )
     elif args.command == 'resize':
         resize(
@@ -153,13 +154,30 @@ def new(hist, pool, root, customer, vault=None, size=None, client=None):
     if not vault and not size:
         LOG.error('If no vault is given, a size is required')
         sys.exit(1)
-    if not vault:
-        new_customer(customer, size)
+    if vault is not None:
+        fs = os.path.join(pool, customer, vault)
+        path = os.path.join(root, customer, vault)
     else:
-        new_vault(customer, vault, size)
+        fs = os.path.join(pool, customer)
+        path = os.path.join(root, customer)
+    fs_status = zfs.new_filesystem(
+        fs,
+        path,
+        size,
+    )
+    if fs_status:
+        hist.add(customer, 'create', vault, size)
+        if vault is not None:
+            if client is None:
+                client = vault
+            dirvish.create_config(
+                os.path.join(root, customer, vault),
+                client,
+            )
+            hist.add(customer, 'dirvish.conf', vault, size)
 
 
-def resize(customer, vault, size):
+def resize(hist, pool, customer, vault=None, size=None):
     """Resize an existing customer or vault.
 
     :param string customer: Customer name.
@@ -172,13 +190,18 @@ def resize(customer, vault, size):
     if not size:
         LOG.error('A size is required')
         sys.exit(1)
-    if not vault:
-        resize_customer(customer, size)
+    if vault:
+        fs = os.path.join(pool, customer, vault)
     else:
-        resize_vault(customer, vault, size)
+        fs = os.path.join(pool, customer)
+    zfs.resize_filesystem(
+        fs,
+        size,
+    )
+    hist.add(customer, 'resize', vault, size)
 
 
-def remove(customer, vault):
+def remove(hist, pool, customer, vault=None):
     """Remove a customer or vault.
 
     :param string customer: Customer name.
@@ -187,10 +210,14 @@ def remove(customer, vault):
     if not customer:
         LOG.error('Customer is needed')
         sys.exit(1)
-    if not vault:
-        remove_customer(customer)
+    if vault:
+        fs = os.path.join(pool, customer, vault)
     else:
-        remove_vault(customer, vault)
+        fs = os.path.join(pool, customer)
+    zfs.remove_filesystem(
+        fs,
+    )
+    hist.add(customer, 'remove', vault)
 
 
 def history_show(history):
