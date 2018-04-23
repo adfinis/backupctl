@@ -5,6 +5,18 @@ python:
   - 3.5
   - 3.6
 
+sudo: true
+
+addons:
+  apt:
+    packages:
+      - zfs-fuse
+
+before_install:
+  - sudo zfs-fuse &
+  - truncate -s 1G "${PWD}/ram_disk_1"
+  - sudo zpool create backup "${PWD}/ram_disk_1"
+
 install:
   - pip install .
   - pip install -r requirements.txt

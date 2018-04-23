@@ -35,7 +35,12 @@ bkpmgmt [--help]
 
 DESCRIPTION
 ===========
-Tool to manage zfs volumes and create new dirvish vault configurations.
+Tool to manage zfs volumes and create new dirvish vault configurations. This
+tool depends on a already present zfs pool, normally called backup.
+This tool should be run with root privileges, if not possible, at least zfs
+fuse access as user is needed (to create new or remove existing zfs datasets
+and set quotas). This is more tricky and may not be tested as well as zfs with
+the kernel module.
 
 
 COMMANDS
