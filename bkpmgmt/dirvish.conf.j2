@@ -1,0 +1,10 @@
+client: {{ client }}
+tree: /
+xdev: 0
+sparse: 1
+index: gzip
+log: gzip
+exclude:
+{%- for line in excludes %}
+    {{ line }}
+{%- endfor %}
