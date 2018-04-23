@@ -65,6 +65,13 @@ def resize_filesystem(fs, size):
     :returns: True if the quota was set correctly, else False.
     :rtype: bool
     """
+    usage = filesystem_usage(fs)
+    if usage > parse_size(size):
+        logger.warn("new size ({0}) is smaller than used size ({1})".format(
+            size,
+            usage,
+        ))
+        return False
     proc = Popen(
         [
             'sudo',
@@ -137,3 +144,85 @@ def remove_filesystem(fs):
             stderr,
         ))
         return False
+
+
+def filesystem_usage(fs):
+    """Get the usage of a filesystem.
+
+    :param string fs:   zfs file system.
+
+    :returns: Number of used bytes or None if an error occured.
+    :rtype: int
+    """
+    proc = Popen(
+        [
+            'sudo',
+            'zfs',
+            'get',
+            '-H',
+            '-o',
+            'value',
+            '-p',
+            'used',
+            '{0}'.format(fs),
+        ],
+        stdout=PIPE,
+        stderr=PIPE,
+    )
+    stdout, stderr = proc.communicate()
+    try:
+        usage = int(stdout)
+    except ValueError as e:
+        logger.error('zfs returned not an integer as usage for "{0}"'.format(
+            fs,
+        ))
+        return None
+    if proc.returncode is 0:
+        logger.info('file system "{0}" use {1}B data'.format(
+            fs,
+            usage,
+        ))
+        return usage
+    else:
+        logger.error('destroy zfs file system "{0}" failed: {1}'.format(
+            fs,
+            stderr,
+        ))
+        return None
+
+
+def parse_size(size):
+    """Convert a human readable file system size ("B", "K", "M", "G", "T")
+    into a number of bytes.
+
+    :param string size: Human readable size.
+
+    :returns: Number of bytes or None if an error occured.
+    :rtype: int
+
+    :raises ValueError: If size couldn't be interpreted.
+    """
+    SYMBOLS = {
+        'customary': ('B', 'K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y'),
+    }
+    init = size
+    num = ""
+    while size and size[0:1].isdigit() or size[0:1] == '.':
+        num += size[0]
+        size = size[1:]
+    num = float(num)
+    letter = size.strip()
+    for name, sset in SYMBOLS.items():
+        if letter in sset:
+            break
+    else:
+        if letter == 'k':
+            # treat 'k' as an alias for 'K' as per: http://goo.gl/kTQMs
+            sset = SYMBOLS['customary']
+            letter = letter.upper()
+        else:
+            raise ValueError("can't interpret %r" % init)
+    prefix = {sset[0]: 1}
+    for i, size in enumerate(sset[1:]):
+        prefix[size] = 1 << (i + 1) * 10
+    return int(num * prefix[letter])
