@@ -126,6 +126,7 @@ def remove_filesystem(fs):
             'sudo',
             'zfs',
             'destroy',
+            '-r',
             '-f',
             '{0}'.format(fs),
         ],
