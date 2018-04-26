@@ -33,7 +33,7 @@ def test_resize_zfs_filesystem_too_small():
 
 
 def test_fs_usage():
-    assert zfs.filesystem_usage('backup/bkpmgmt-test1') < 1024*1024
+    assert zfs.filesystem_usage('backup/bkpmgmt-test1') < 1024 * 1024
 
 
 def test_remove_zfs_filesystem():
