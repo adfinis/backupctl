@@ -65,7 +65,7 @@ def test_customer(mock_zfs):
             '-o',
             'quota=1G',
             '-o',
-            'mountpoint=/srv/backup/customer1',
+            'mountpoint=/tmp/backup/customer1',
             'backup/customer1',
         ],
         [
@@ -156,7 +156,7 @@ def test_vault(mock_zfs):
             '-o',
             'quota=1G',
             '-o',
-            'mountpoint=/srv/backup/customer1',
+            'mountpoint=/tmp/backup/customer1',
             'backup/customer1',
         ],
         [
@@ -169,7 +169,7 @@ def test_vault(mock_zfs):
             '-o',
             'quota=500M',
             '-o',
-            'mountpoint=/srv/backup/customer1/www.example.com',
+            'mountpoint=/tmp/backup/customer1/www.example.com',
             'backup/customer1/www.example.com',
         ],
         [
@@ -182,7 +182,7 @@ def test_vault(mock_zfs):
             '-o',
             'quota=500M',
             '-o',
-            'mountpoint=/srv/backup/customer1/mail.example.com',
+            'mountpoint=/tmp/backup/customer1/mail.example.com',
             'backup/customer1/mail.example.com',
         ],
         [
