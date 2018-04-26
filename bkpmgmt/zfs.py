@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import logging
-from subprocess import PIPE, Popen
+import subprocess
 
 logger = logging.getLogger(__name__)
 
@@ -24,26 +24,20 @@ def new_filesystem(fs, path, size, compression=True):
         compression = 'compression=on'
     else:
         compression = 'compression=off'
-    proc = Popen(
-        [
-            'sudo',
-            'zfs',
-            'create',
-            '-o',
-            compression,
-            '-o',
-            'dedup=off',
-            '-o',
-            'quota={0}'.format(size),
-            '-o',
-            'mountpoint={0}'.format(path),
-            '{0}'.format(fs),
-        ],
-        stdout=PIPE,
-        stderr=PIPE,
-    )
-    stdout, stderr = proc.communicate()
-    if proc.returncode is 0:
+    returncode, stdout, stderr = execute_cmd([
+        'zfs',
+        'create',
+        '-o',
+        compression,
+        '-o',
+        'dedup=off',
+        '-o',
+        'quota={0}'.format(size),
+        '-o',
+        'mountpoint={0}'.format(path),
+        '{0}'.format(fs),
+    ])
+    if returncode == 0:
         logger.info('created zfs file system "{0}" successfully'.format(
             fs,
         ))
@@ -72,19 +66,13 @@ def resize_filesystem(fs, size):
             usage,
         ))
         return False
-    proc = Popen(
-        [
-            'sudo',
-            'zfs',
-            'set',
-            'quota={0}'.format(size),
-            '{0}'.format(fs),
-        ],
-        stdout=PIPE,
-        stderr=PIPE,
-    )
-    stdout, stderr = proc.communicate()
-    if proc.returncode is 0:
+    returncode, stdout, stderr = execute_cmd([
+        'zfs',
+        'set',
+        'quota={0}'.format(size),
+        '{0}'.format(fs),
+    ])
+    if returncode == 0:
         logger.info(
             'set zfs file system quota for "{0}" to {1} successfully'.format(
                 fs,
@@ -109,32 +97,20 @@ def remove_filesystem(fs):
     :returns: True if the file system was removed correctly, else False.
     :rtype: bool
     """
-    proc = Popen(
-        [
-            'sudo',
-            'zfs',
-            'set',
-            'mountpoint=none',
-            '{0}'.format(fs),
-        ],
-        stdout=PIPE,
-        stderr=PIPE,
-    )
-    stdout, stderr = proc.communicate()
-    proc = Popen(
-        [
-            'sudo',
-            'zfs',
-            'destroy',
-            '-r',
-            '-f',
-            '{0}'.format(fs),
-        ],
-        stdout=PIPE,
-        stderr=PIPE,
-    )
-    stdout, stderr = proc.communicate()
-    if proc.returncode is 0:
+    execute_cmd([
+        'zfs',
+        'set',
+        'mountpoint=none',
+        '{0}'.format(fs),
+    ])
+    returncode, stdout, stderr = execute_cmd([
+        'zfs',
+        'destroy',
+        '-r',
+        '-f',
+        '{0}'.format(fs),
+    ])
+    if returncode == 0:
         logger.info('destroyed zfs file system "{0}" successfully'.format(
             fs,
         ))
@@ -155,22 +131,16 @@ def filesystem_usage(fs):
     :returns: Number of used bytes or None if an error occured.
     :rtype: int
     """
-    proc = Popen(
-        [
-            'sudo',
-            'zfs',
-            'get',
-            '-H',
-            '-o',
-            'value',
-            '-p',
-            'used',
-            '{0}'.format(fs),
-        ],
-        stdout=PIPE,
-        stderr=PIPE,
-    )
-    stdout, stderr = proc.communicate()
+    returncode, stdout, stderr = execute_cmd([
+        'zfs',
+        'get',
+        '-H',
+        '-o',
+        'value',
+        '-p',
+        'used',
+        '{0}'.format(fs),
+    ])
     try:
         usage = int(stdout)
     except ValueError as e:
@@ -178,7 +148,7 @@ def filesystem_usage(fs):
             fs,
         ))
         return None
-    if proc.returncode is 0:
+    if returncode == 0:
         logger.info('file system "{0}" use {1}B data'.format(
             fs,
             usage,
@@ -227,3 +197,34 @@ def parse_size(size):
     for i, size in enumerate(sset[1:]):
         prefix[size] = 1 << (i + 1) * 10
     return int(num * prefix[letter])
+
+
+def execute_cmd(command, stdin='', communicate=True):
+    """Executes the given command (which should be a list).
+
+    If you pass stdin, it will be written to the command's stdin.
+    :param command:      the command to execute
+    :type command:       list
+    :param stdin:        will be written to the command's stdin
+    :type stdin:         string
+    :param communicate:  If False the helper will not communicate with the
+                         process: useful for background process (otherwise
+                         the command will block)
+    :type communicate:   Boolean
+
+    Returns a tuple of (returncode, stdout, stderr) upon completion.
+    """
+
+    returncode = 0
+    is_shell = isinstance(command, str)
+    proc = subprocess.Popen(
+        command,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        shell=is_shell
+    )
+    if communicate:
+        (stdout, stderr) = proc.communicate(stdin)
+        returncode = proc.wait()
+        return (returncode, stdout.decode('utf8'), stderr.decode('utf8'))
+    return (None, None, None)
