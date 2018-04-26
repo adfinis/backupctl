@@ -144,9 +144,12 @@ def config():
 def new(hist, pool, root, customer, vault=None, size=None, client=None):
     """Create a new customer or a new vault/server.
 
-    :param string customer: Customer name.
-    :param string vault:    Vault name or server hostname.
-    :param string size:     Quota for this customer or vault.
+    :param history.History hist:    History database.
+    :param string pool:             ZFS Pool name.
+    :param string root:             Backup root path.
+    :param string customer:         Customer name.
+    :param string vault:            Vault name or server hostname.
+    :param string size:             Quota for this customer or vault.
     """
     if not customer:
         LOG.error('Customer is needed')
@@ -180,9 +183,11 @@ def new(hist, pool, root, customer, vault=None, size=None, client=None):
 def resize(hist, pool, customer, vault=None, size=None):
     """Resize an existing customer or vault.
 
-    :param string customer: Customer name.
-    :param string vault:    Vault name or server hostname.
-    :param string size:     Quota for this customer or vault.
+    :param history.History hist:    History database.
+    :param string pool:             ZFS Pool name.
+    :param string customer:         Customer name.
+    :param string vault:            Vault name or server hostname.
+    :param string size:             Quota for this customer or vault.
     """
     if not customer:
         LOG.error('Customer is needed')
@@ -204,8 +209,10 @@ def resize(hist, pool, customer, vault=None, size=None):
 def remove(hist, pool, customer, vault=None):
     """Remove a customer or vault.
 
-    :param string customer: Customer name.
-    :param string vault:    Vault name or server hostname.
+    :param history.History hist:    History database.
+    :param string pool:             ZFS Pool name.
+    :param string customer:         Customer name.
+    :param string vault:            Vault name or server hostname.
     """
     if not customer:
         LOG.error('Customer is needed')
@@ -222,6 +229,8 @@ def remove(hist, pool, customer, vault=None):
 
 def history_show(history):
     """Manage the command log.
+
+    :param history.History history: History database.
     """
     for row in history.show():
         print(row)
