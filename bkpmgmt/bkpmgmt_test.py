@@ -37,17 +37,21 @@ def mock_zfs(mocker):
 def test_customer(mock_zfs):
     bkpmgmt.new(
         hist(),
+        pool='backup',
+        root='/tmp/backup',
         customer='customer1',
         size='1G',
         client=None,
     )
     bkpmgmt.resize(
         hist(),
+        pool='backup',
         customer='customer1',
         size='2G',
     )
     bkpmgmt.remove(
         hist(),
+        pool='backup',
         customer='customer1',
     )
     assert mock_zfs == [
@@ -99,12 +103,16 @@ def test_customer(mock_zfs):
 def test_vault(mock_zfs):
     bkpmgmt.new(
         hist(),
+        pool='backup',
+        root='/tmp/backup',
         customer='customer1',
         size='1G',
         client=None,
     )
     bkpmgmt.new(
         hist(),
+        pool='backup',
+        root='/tmp/backup',
         customer='customer1',
         vault='www.example.com',
         size='500M',
@@ -112,6 +120,8 @@ def test_vault(mock_zfs):
     )
     bkpmgmt.new(
         hist(),
+        pool='backup',
+        root='/tmp/backup',
         customer='customer1',
         vault='mail.example.com',
         size='500M',
@@ -119,17 +129,20 @@ def test_vault(mock_zfs):
     )
     bkpmgmt.resize(
         hist(),
+        pool='backup',
         customer='customer1',
         vault='mail.example.com',
         size='200M',
     )
     bkpmgmt.remove(
         hist(),
+        pool='backup',
         customer='customer1',
         vault='mail.example.com',
     )
     bkpmgmt.remove(
         hist(),
+        pool='backup',
         customer='customer1',
     )
     assert mock_zfs == [
