@@ -12,8 +12,7 @@ install:
   - pip install -r requirements.txt
 
 script:
-  - py.test --cov=bkpmgmt bkpmgmt
-  - isort -df -vb -ns "__init__.py" -sg "" -s "" -rc -c -p bkpmgmt bkpmgmt
+  - make test
   - make man
 
 # vim: set ts=2 sw=2 :

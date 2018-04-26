@@ -7,3 +7,7 @@ bkpmgmt.8: README.rst
 
 clean:
 	rm -rf build/ dist/ *.egg-info
+
+test:
+	isort -df -vb -ns "__init__.py" -sg "" -s "" -rc -c -p bkpmgmt bkpmgmt
+	py.test --cov-report term-missing --cov=bkpmgmt bkpmgmt
