@@ -8,11 +8,11 @@ import pytest
 from bkpmgmt import zfs
 
 mock_data = {
-    'zfs-create':   (0, '', ''),
-    'zfs-resize':   (0, '', ''),
-    'zfs-destroy':  (0, '', ''),
+    'zfs-create':   (0, '',  ''),
+    'zfs-resize':   (0, '',  ''),
+    'zfs-destroy':  (0, '',  ''),
     'zfs-get':      (0, '0', ''),
-    'zfs-set':      (0, '', ''),
+    'zfs-set':      (0, '',  ''),
 }
 
 
@@ -157,12 +157,15 @@ def test_remove_zfs_filesystem(mock_zfs):
     ]
 
 
-def test_parse_size():
-    assert zfs.parse_size('1B') == 1
-    assert zfs.parse_size('10k') == 10240
-    assert zfs.parse_size('400M') == 419430400
-    assert zfs.parse_size('11G') == 11811160064
-    assert zfs.parse_size('1T') == 1099511627776
+@pytest.mark.parametrize("human_size, parsed_bytes", [
+    ('1B',      1),
+    ('10k',     10240),
+    ('400M',    419430400),
+    ('11G',     11811160064),
+    ('1T',      1099511627776),
+])
+def test_parse_size(human_size, parsed_bytes):
+    assert zfs.parse_size(human_size) == parsed_bytes
 
 
 def test_execute_cmd():
