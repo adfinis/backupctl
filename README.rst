@@ -141,6 +141,11 @@ Successful completion.
 An error occurred.
 
 
+2
+--
+No command was given.
+
+
 FILES
 =====
 
