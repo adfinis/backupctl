@@ -13,14 +13,6 @@ from bkpmgmt import history
 CONFIG_USER = '~/.config/bkpmgmt.ini'
 CONFIG_SYSTEM = '/etc/bkpmgmt.ini'
 
-CONFIG = configparser.ConfigParser()
-CONFIG['database'] = {
-    'path': '/var/lib/bkpmgmt.db',
-}
-CONFIG['zfs'] = {
-    'pool': 'backup',
-}
-
 LOG = logging.getLogger(__name__)
 LOG.addHandler(logging.StreamHandler())
 LOG.setLevel(logging.WARN)
@@ -81,28 +73,20 @@ def main():
     )
     args = parser.parse_args()
 
-    global CONFIG
+    cfg = config()
     try:
-        CONFIG.read_file(open(os.path.expanduser(CONFIG_USER)))
-    except FileNotFoundError as e:
-        try:
-            CONFIG.read_file(open(CONFIG_SYSTEM))
-        except FileNotFoundError as e:
-            with open(os.path.expanduser(CONFIG_USER), 'w') as configfile:
-                CONFIG.write(configfile)
-            LOG.warn('New configuration written to {0}'.format(CONFIG_USER))
-
-    try:
-        hist = history.History(CONFIG['database']['path'])
+        hist = history.History(cfg['database']['path'])
     except sqlite3.OperationalError as e:
         LOG.error("Couldn't open database {0}. Exit now.".format(
-            CONFIG['database']['path'],
+            cfg['database']['path'],
         ))
         sys.exit(1)
 
     if args.command == 'new':
         new(
             hist,
+            cfg['zfs']['pool'],
+            cfg['zfs']['root'],
             args.customer,
             args.vault,
             args.size,
@@ -110,6 +94,7 @@ def main():
     elif args.command == 'resize':
         resize(
             hist,
+            cfg['zfs']['pool'],
             args.customer,
             args.vault,
             args.size,
@@ -117,6 +102,7 @@ def main():
     elif args.command == 'remove':
         remove(
             hist,
+            cfg['zfs']['pool'],
             args.customer,
             args.vault,
         )
@@ -127,7 +113,34 @@ def main():
     sys.exit(0)
 
 
-def new(customer, vault, size):
+def config():
+    """Read the configuration files. If no configuration exists, write the
+    default configuration to the directory ~/.config.
+
+    :returns: Configuration object.
+    :rtype: `configparser.ConfigParser`
+    """
+    cfg = configparser.ConfigParser()
+    cfg['database'] = {
+        'path': '/var/lib/bkpmgmt.db',
+    }
+    cfg['zfs'] = {
+        'pool': 'backup',
+        'root': '/srv/backup',
+    }
+    try:
+        cfg.read_file(open(os.path.expanduser(CONFIG_USER)))
+    except FileNotFoundError as e:
+        try:
+            cfg.read_file(open(CONFIG_SYSTEM))
+        except FileNotFoundError as e:
+            with open(os.path.expanduser(CONFIG_USER), 'w') as configfile:
+                cfg.write(configfile)
+            LOG.warn('New configuration written to {0}'.format(CONFIG_USER))
+    return cfg
+
+
+def new(hist, pool, root, customer, vault=None, size=None, client=None):
     """Create a new customer or a new vault/server.
 
     :param string customer: Customer name.
