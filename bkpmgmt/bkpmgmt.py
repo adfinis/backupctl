@@ -177,7 +177,7 @@ def new(hist, pool, root, customer, vault=None, size=None, client=None):
                 os.path.join(root, customer, vault),
                 client,
             )
-            hist.add(customer, 'dirvish.conf', vault, size)
+            hist.add(customer, 'config', vault)
 
 
 def resize(hist, pool, customer, vault=None, size=None):
