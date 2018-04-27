@@ -34,6 +34,57 @@ def mock_zfs(mocker):
     yield commands
 
 
+@pytest.mark.parametrize("parameters, exit_code", [
+    ([],                                                                    2),
+    (['new'],                                                               1),
+    (['new', '-n', 'customer1'],                                            1),
+    (['new', '-n', 'customer1', '-s', '10M'],                               0),
+    (['new', '-n', 'customer1', '-v', 'www.example.com'],                   0),
+    (['new', '-n', 'customer1', '-v', 'www.example.com', '-s', '10M'],      0),
+    (['resize'],                                                            1),
+    (['resize', '-n', 'customer1'],                                         1),
+    (['resize', '-n', 'customer1', '-s', '10M'],                            0),
+    (['resize', '-n', 'customer1', '-v', 'www.example.com'],                1),
+    (['resize', '-n', 'customer1', '-v', 'www.example.com', '-s', '10M'],   0),
+    (['remove'],                                                            1),
+    (['remove', '-n', 'customer1'],                                         0),
+    (['remove', '-n', 'customer1', '-v', 'www.example.com'],                0),
+    (['log'],                                                               0),
+    (['test'],                                                              1),
+])
+def test_main(parameters, exit_code, mocker, mock_zfs):
+    mocker.patch('sys.argv', [
+        'bkpmgmt.py',
+    ] + parameters)
+
+    def mocked():
+        import configparser
+        cfg = configparser.ConfigParser()
+        cfg['database'] = {
+            'path': '/tmp/bkpmgmt.db',
+        }
+        cfg['zfs'] = {
+            'pool': 'backup',
+            'root': '/tmp/backup',
+        }
+        return cfg
+
+    mocker.patch('bkpmgmt.bkpmgmt.config', mocked)
+    with pytest.raises(SystemExit) as pytest_wrapped_e:
+        bkpmgmt.main()
+    assert pytest_wrapped_e.type == SystemExit
+    assert pytest_wrapped_e.value.code == exit_code
+
+
+def test_config():
+    cfg = bkpmgmt.config()
+    import configparser
+    assert type(cfg) == configparser.ConfigParser
+    assert type(cfg['database']['path']) == str
+    assert type(cfg['zfs']['pool']) == str
+    assert type(cfg['zfs']['root']) == str
+
+
 def test_customer(mock_zfs):
     bkpmgmt.new(
         hist(),
