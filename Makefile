@@ -4,7 +4,7 @@ MANPAGES	:= $(PROJECT).8.gz $(PROJECT).ini.5.gz
 man: $(MANPAGES)
 
 $(PROJECT).%: $(PROJECT).%.rst
-	rst2man.py $< > $@
+	rst2man $< > $@
 
 %.gz: %
 	gzip -c $< > $@
