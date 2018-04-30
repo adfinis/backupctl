@@ -6,6 +6,7 @@ python:
   - 3.6
 
 sudo: true
+cache: pip
 
 install:
   - pip install .
