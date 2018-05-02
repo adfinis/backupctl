@@ -8,18 +8,10 @@ import os
 import sqlite3
 import sys
 
-from bkpmgmt import history
+from bkpmgmt import dirvish, history, zfs
 
 CONFIG_USER = '~/.config/bkpmgmt.ini'
 CONFIG_SYSTEM = '/etc/bkpmgmt.ini'
-
-CONFIG = configparser.ConfigParser()
-CONFIG['database'] = {
-    'path': '/var/lib/bkpmgmt.db',
-}
-CONFIG['zfs'] = {
-    'pool': 'backup',
-}
 
 LOG = logging.getLogger(__name__)
 LOG.addHandler(logging.StreamHandler())
@@ -81,35 +73,29 @@ def main():
     )
     args = parser.parse_args()
 
-    global CONFIG
+    cfg = config()
     try:
-        CONFIG.read_file(open(os.path.expanduser(CONFIG_USER)))
-    except FileNotFoundError as e:
-        try:
-            CONFIG.read_file(open(CONFIG_SYSTEM))
-        except FileNotFoundError as e:
-            with open(os.path.expanduser(CONFIG_USER), 'w') as configfile:
-                CONFIG.write(configfile)
-            LOG.warn('New configuration written to {0}'.format(CONFIG_USER))
-
-    try:
-        hist = history.History(CONFIG['database']['path'])
+        hist = history.History(cfg['database']['path'])
     except sqlite3.OperationalError as e:
         LOG.error("Couldn't open database {0}. Exit now.".format(
-            CONFIG['database']['path'],
+            cfg['database']['path'],
         ))
         sys.exit(1)
 
     if args.command == 'new':
         new(
             hist,
+            cfg['zfs']['pool'],
+            cfg['zfs']['root'],
             args.customer,
             args.vault,
             args.size,
+            args.dirvish_client,
         )
     elif args.command == 'resize':
         resize(
             hist,
+            cfg['zfs']['pool'],
             args.customer,
             args.vault,
             args.size,
@@ -117,6 +103,7 @@ def main():
     elif args.command == 'remove':
         remove(
             hist,
+            cfg['zfs']['pool'],
             args.customer,
             args.vault,
         )
@@ -127,12 +114,42 @@ def main():
     sys.exit(0)
 
 
-def new(customer, vault, size):
+def config():
+    """Read the configuration files. If no configuration exists, write the
+    default configuration to the directory ~/.config.
+
+    :returns: Configuration object.
+    :rtype: `configparser.ConfigParser`
+    """
+    cfg = configparser.ConfigParser()
+    cfg['database'] = {
+        'path': '/var/lib/bkpmgmt.db',
+    }
+    cfg['zfs'] = {
+        'pool': 'backup',
+        'root': '/srv/backup',
+    }
+    try:
+        cfg.read_file(open(os.path.expanduser(CONFIG_USER)))
+    except FileNotFoundError as e:
+        try:
+            cfg.read_file(open(CONFIG_SYSTEM))
+        except FileNotFoundError as e:
+            with open(os.path.expanduser(CONFIG_USER), 'w') as configfile:
+                cfg.write(configfile)
+            LOG.warn('New configuration written to {0}'.format(CONFIG_USER))
+    return cfg
+
+
+def new(hist, pool, root, customer, vault=None, size=None, client=None):
     """Create a new customer or a new vault/server.
 
-    :param string customer: Customer name.
-    :param string vault:    Vault name or server hostname.
-    :param string size:     Quota for this customer or vault.
+    :param history.History hist:    History database.
+    :param string pool:             ZFS Pool name.
+    :param string root:             Backup root path.
+    :param string customer:         Customer name.
+    :param string vault:            Vault name or server hostname.
+    :param string size:             Quota for this customer or vault.
     """
     if not customer:
         LOG.error('Customer is needed')
@@ -140,18 +157,37 @@ def new(customer, vault, size):
     if not vault and not size:
         LOG.error('If no vault is given, a size is required')
         sys.exit(1)
-    if not vault:
-        new_customer(customer, size)
+    if vault is not None:
+        fs = os.path.join(pool, customer, vault)
+        path = os.path.join(root, customer, vault)
     else:
-        new_vault(customer, vault, size)
+        fs = os.path.join(pool, customer)
+        path = os.path.join(root, customer)
+    fs_status = zfs.new_filesystem(
+        fs,
+        path,
+        size,
+    )
+    if fs_status:
+        hist.add(customer, 'create', vault, size)
+        if vault is not None:
+            if client is None:
+                client = vault
+            dirvish.create_config(
+                os.path.join(root, customer, vault),
+                client,
+            )
+            hist.add(customer, 'config', vault)
 
 
-def resize(customer, vault, size):
+def resize(hist, pool, customer, vault=None, size=None):
     """Resize an existing customer or vault.
 
-    :param string customer: Customer name.
-    :param string vault:    Vault name or server hostname.
-    :param string size:     Quota for this customer or vault.
+    :param history.History hist:    History database.
+    :param string pool:             ZFS Pool name.
+    :param string customer:         Customer name.
+    :param string vault:            Vault name or server hostname.
+    :param string size:             Quota for this customer or vault.
     """
     if not customer:
         LOG.error('Customer is needed')
@@ -159,29 +195,42 @@ def resize(customer, vault, size):
     if not size:
         LOG.error('A size is required')
         sys.exit(1)
-    if not vault:
-        resize_customer(customer, size)
+    if vault:
+        fs = os.path.join(pool, customer, vault)
     else:
-        resize_vault(customer, vault, size)
+        fs = os.path.join(pool, customer)
+    zfs.resize_filesystem(
+        fs,
+        size,
+    )
+    hist.add(customer, 'resize', vault, size)
 
 
-def remove(customer, vault):
+def remove(hist, pool, customer, vault=None):
     """Remove a customer or vault.
 
-    :param string customer: Customer name.
-    :param string vault:    Vault name or server hostname.
+    :param history.History hist:    History database.
+    :param string pool:             ZFS Pool name.
+    :param string customer:         Customer name.
+    :param string vault:            Vault name or server hostname.
     """
     if not customer:
         LOG.error('Customer is needed')
         sys.exit(1)
-    if not vault:
-        remove_customer(customer)
+    if vault:
+        fs = os.path.join(pool, customer, vault)
     else:
-        remove_vault(customer, vault)
+        fs = os.path.join(pool, customer)
+    zfs.remove_filesystem(
+        fs,
+    )
+    hist.add(customer, 'remove', vault)
 
 
 def history_show(history):
     """Manage the command log.
+
+    :param history.History history: History database.
     """
     for row in history.show():
         print(row)
