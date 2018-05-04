@@ -145,7 +145,7 @@ def new(hist, pool, root, customer, vault=None, size=None, client=None):
     """Create a new customer or a new vault/server.
 
     :param history.History hist:    History database.
-    :param string pool:             ZFS Pool name.
+    :param string pool:             ZFS pool name.
     :param string root:             Backup root path.
     :param string customer:         Customer name.
     :param string vault:            Vault name or server hostname.
@@ -184,7 +184,7 @@ def resize(hist, pool, customer, vault=None, size=None):
     """Resize an existing customer or vault.
 
     :param history.History hist:    History database.
-    :param string pool:             ZFS Pool name.
+    :param string pool:             ZFS pool name.
     :param string customer:         Customer name.
     :param string vault:            Vault name or server hostname.
     :param string size:             Quota for this customer or vault.
@@ -210,7 +210,7 @@ def remove(hist, pool, customer, vault=None):
     """Remove a customer or vault.
 
     :param history.History hist:    History database.
-    :param string pool:             ZFS Pool name.
+    :param string pool:             ZFS pool name.
     :param string customer:         Customer name.
     :param string vault:            Vault name or server hostname.
     """
