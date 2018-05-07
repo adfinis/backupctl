@@ -15,3 +15,7 @@ clean:
 test:
 	isort -df -vb -ns "__init__.py" -sg "" -s "" -rc -c -p $(PROJECT) $(PROJECT)
 	py.test --cov-report term-missing --cov=$(PROJECT) $(PROJECT)
+
+rpm:
+	spectool -g -R $(PROJECT).spec
+	rpmbuild -ba $(PROJECT).spec
