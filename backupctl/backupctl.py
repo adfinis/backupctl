@@ -8,10 +8,9 @@ import os
 import sqlite3
 import sys
 
-from backupctl import dirvish, history, zfs
+import xdg
 
-CONFIG_USER = '~/.config/backupctl.ini'
-CONFIG_SYSTEM = '/etc/backupctl.ini'
+from backupctl import dirvish, history, zfs
 
 LOG = logging.getLogger(__name__)
 LOG.addHandler(logging.StreamHandler())
@@ -75,7 +74,10 @@ def main():
 
     cfg = config()
     try:
-        hist = history.History(cfg['database']['path'])
+        hist = history.History(cfg['database'].get(
+            'path',
+            '/var/lib/backupctl/backupctl.db',
+        ))
     except sqlite3.OperationalError as e:
         LOG.error("Couldn't open database {0}. Exit now.".format(
             cfg['database']['path'],
@@ -122,22 +124,9 @@ def config():
     :rtype: `configparser.ConfigParser`
     """
     cfg = configparser.ConfigParser()
-    cfg['database'] = {
-        'path': '/var/lib/backupctl.db',
-    }
-    cfg['zfs'] = {
-        'pool': 'backup',
-        'root': '/srv/backup',
-    }
-    try:
-        cfg.read_file(open(os.path.expanduser(CONFIG_USER)))
-    except FileNotFoundError as e:
-        try:
-            cfg.read_file(open(CONFIG_SYSTEM))
-        except FileNotFoundError as e:
-            with open(os.path.expanduser(CONFIG_USER), 'w') as configfile:
-                cfg.write(configfile)
-            LOG.warn('New configuration written to {0}'.format(CONFIG_USER))
+    cfg.read(os.path.join(os.sep, 'etc', 'backupctl.db'))
+    cfg.read(os.path.join(xdg.XDG_CONFIG_HOME, 'backupctl.ini'))
+    cfg.read('backupctl.ini')
     return cfg
 
 
