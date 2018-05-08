@@ -3,7 +3,7 @@
 
 import pytest
 
-from bkpmgmt import version
+from backupctl import version
 
 
 def test_version():

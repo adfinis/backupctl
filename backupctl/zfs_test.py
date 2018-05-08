@@ -5,7 +5,7 @@
 
 import pytest
 
-from bkpmgmt import zfs
+from backupctl import zfs
 
 mock_data = {
     'zfs-create':   (0, '',  ''),
@@ -23,14 +23,14 @@ def mock_zfs(mocker):
     def mocked(cmd):
         commands.append(cmd)
         return mock_data['-'.join(cmd[:2])]
-    mocker.patch('bkpmgmt.zfs.execute_cmd', mocked)
+    mocker.patch('backupctl.zfs.execute_cmd', mocked)
     yield commands
 
 
 def test_new_zfs_filesystem(mock_zfs):
     zfs.new_filesystem(
-        'backup/bkpmgmt-test1',
-        '/tmp/bkpmgmt-test1',
+        'backup/backupctl-test1',
+        '/tmp/backupctl-test1',
         '10M',
         compression=True,
     )
@@ -44,15 +44,15 @@ def test_new_zfs_filesystem(mock_zfs):
         '-o',
         'quota=10M',
         '-o',
-        'mountpoint=/tmp/bkpmgmt-test1',
-        'backup/bkpmgmt-test1',
+        'mountpoint=/tmp/backupctl-test1',
+        'backup/backupctl-test1',
     ]]
 
 
 def test_new_zfs_filesystem_no_compression(mock_zfs):
     zfs.new_filesystem(
-        'backup/bkpmgmt-test1',
-        '/tmp/bkpmgmt-test1',
+        'backup/backupctl-test1',
+        '/tmp/backupctl-test1',
         '10M',
         compression=False,
     )
@@ -66,14 +66,14 @@ def test_new_zfs_filesystem_no_compression(mock_zfs):
         '-o',
         'quota=10M',
         '-o',
-        'mountpoint=/tmp/bkpmgmt-test1',
-        'backup/bkpmgmt-test1',
+        'mountpoint=/tmp/backupctl-test1',
+        'backup/backupctl-test1',
     ]]
 
 
 def test_resize_zfs_filesystem(mock_zfs):
     assert zfs.resize_filesystem(
-        'backup/bkpmgmt-test1',
+        'backup/backupctl-test1',
         '20M',
     )
     assert mock_zfs == [
@@ -85,13 +85,13 @@ def test_resize_zfs_filesystem(mock_zfs):
             'value',
             '-p',
             'used',
-            'backup/bkpmgmt-test1',
+            'backup/backupctl-test1',
         ],
         [
             'zfs',
             'set',
             'quota=20M',
-            'backup/bkpmgmt-test1',
+            'backup/backupctl-test1',
         ],
     ]
 
@@ -99,7 +99,7 @@ def test_resize_zfs_filesystem(mock_zfs):
 @pytest.mark.xfail
 def test_resize_zfs_filesystem_too_small(mock_zfs):
     assert zfs.resize_filesystem(
-        'backup/bkpmgmt-test1',
+        'backup/backupctl-test1',
         '1',
     )
     assert mock_zfs == [
@@ -111,19 +111,19 @@ def test_resize_zfs_filesystem_too_small(mock_zfs):
             'value',
             '-p',
             'used',
-            'backup/bkpmgmt-test1',
+            'backup/backupctl-test1',
         ],
         [
             'zfs',
             'set',
             'quota=1',
-            'backup/bkpmgmt-test1',
+            'backup/backupctl-test1',
         ],
     ]
 
 
 def test_fs_usage(mock_zfs):
-    assert zfs.filesystem_usage('backup/bkpmgmt-test1') == 0
+    assert zfs.filesystem_usage('backup/backupctl-test1') == 0
     assert mock_zfs == [[
         'zfs',
         'get',
@@ -132,27 +132,27 @@ def test_fs_usage(mock_zfs):
         'value',
         '-p',
         'used',
-        'backup/bkpmgmt-test1',
+        'backup/backupctl-test1',
     ]]
 
 
 def test_remove_zfs_filesystem(mock_zfs):
     assert zfs.remove_filesystem(
-        'backup/bkpmgmt-test1',
+        'backup/backupctl-test1',
     )
     assert mock_zfs == [
         [
             'zfs',
             'set',
             'mountpoint=none',
-            'backup/bkpmgmt-test1',
+            'backup/backupctl-test1',
         ],
         [
             'zfs',
             'destroy',
             '-r',
             '-f',
-            'backup/bkpmgmt-test1',
+            'backup/backupctl-test1',
         ],
     ]
 

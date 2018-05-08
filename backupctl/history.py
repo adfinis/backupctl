@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 
 
 class History:
-    """Store and show history of commands done with the bkpmgmt tool.
+    """Store and show history of commands done with the backupctl tool.
 
     :ivar string dbpath: Path to the history database.
 

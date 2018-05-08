@@ -3,11 +3,11 @@
 
 """Test for class dirvish"""
 
-from bkpmgmt import dirvish
+from backupctl import dirvish
 
 
 def test_dirvish_config():
     assert dirvish.create_config(
-        '/tmp/bkpmgmt/www.example.com',
+        '/tmp/backupctl/www.example.com',
         'www.example.com',
     )
