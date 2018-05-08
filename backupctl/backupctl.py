@@ -85,30 +85,51 @@ def main():
         sys.exit(1)
 
     if args.command == 'new':
-        new(
-            hist,
-            cfg['zfs']['pool'],
-            cfg['zfs']['root'],
-            args.customer,
-            args.vault,
-            args.size,
-            args.dirvish_client,
-        )
+        try:
+            new(
+                hist,
+                cfg['zfs']['pool'],
+                cfg['zfs']['root'],
+                args.customer,
+                args.vault,
+                args.size,
+                args.dirvish_client,
+            )
+        except KeyError as e:
+            LOG.error(
+                "ZFS Pool and ZFS Root must be specified in any "
+                "configuration file. Exit now."
+            )
+            sys.exit(1)
     elif args.command == 'resize':
-        resize(
-            hist,
-            cfg['zfs']['pool'],
-            args.customer,
-            args.vault,
-            args.size,
-        )
+        try:
+            resize(
+                hist,
+                cfg['zfs']['pool'],
+                args.customer,
+                args.vault,
+                args.size,
+            )
+        except KeyError as e:
+            LOG.error(
+                "ZFS Pool must be specified in any configuration file. "
+                "Exit now."
+            )
+            sys.exit(1)
     elif args.command == 'remove':
-        remove(
-            hist,
-            cfg['zfs']['pool'],
-            args.customer,
-            args.vault,
-        )
+        try:
+            remove(
+                hist,
+                cfg['zfs']['pool'],
+                args.customer,
+                args.vault,
+            )
+        except KeyError as e:
+            LOG.error(
+                "ZFS Pool must be specified in any configuration file. "
+                "Exit now."
+            )
+            sys.exit(1)
     elif args.command == 'log':
         history_show(hist)
     else:
