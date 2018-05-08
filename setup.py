@@ -30,6 +30,7 @@ setup(
     keywords='dirvish, zfs',
     url='https://www.adfinis-sygroup.ch/',
     packages=find_packages(),
+    include_package_data=True,
     classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Console',
