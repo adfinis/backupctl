@@ -154,6 +154,64 @@ def main():
     sys.exit(0)
 
 
+def backup_start():
+    """Add an entry to the database when a dirvish backup is started.
+
+    This function should be triggered by dirvish pre-server.
+    """
+    cfg = config()
+    if not os.path.exists(os.path.dirname(cfg['database'].get('path'))):
+        os.makedirs(os.path.dirname(cfg['database'].get('path')))
+    try:
+        engine = sqlalchemy.create_engine(cfg['database'].get('fullpath'))
+        LOG.debug(
+            "Opened database {0} successfully".format(
+                cfg['database'].get('fullpath'),
+            )
+        )
+    except sqlalchemy.exc.ArgumentError as e:
+        LOG.error("Couldn't open database {0}. Exit now.".format(
+            cfg['database'].get('fullpath'),
+        ))
+        sys.exit(1)
+    except sqlalchemy.exc.OperationalError as e:
+        LOG.error("Couldn't open database {0}. Exit now.".format(
+            cfg['database'].get('fullpath'),
+        ))
+        sys.exit(1)
+    dirvish = Dirvish(engine)
+    dirvish.backup_start()
+
+
+def backup_stop():
+    """Add an entry to the database when a dirvish backup is stopped.
+
+    This function should be triggered by dirvish post-server.
+    """
+    cfg = config()
+    if not os.path.exists(os.path.dirname(cfg['database'].get('path'))):
+        os.makedirs(os.path.dirname(cfg['database'].get('path')))
+    try:
+        engine = sqlalchemy.create_engine(cfg['database'].get('fullpath'))
+        LOG.debug(
+            "Opened database {0} successfully".format(
+                cfg['database'].get('fullpath'),
+            )
+        )
+    except sqlalchemy.exc.ArgumentError as e:
+        LOG.error("Couldn't open database {0}. Exit now.".format(
+            cfg['database'].get('fullpath'),
+        ))
+        sys.exit(1)
+    except sqlalchemy.exc.OperationalError as e:
+        LOG.error("Couldn't open database {0}. Exit now.".format(
+            cfg['database'].get('fullpath'),
+        ))
+        sys.exit(1)
+    dirvish = Dirvish(engine)
+    dirvish.backup_stop()
+
+
 def config():
     """Read the configuration files. If no configuration exists, write the
     default configuration to the directory ~/.config.
