@@ -1,6 +1,6 @@
-=========
- bkpmgmt
-=========
+===========
+ backupctl
+===========
 
 ------------------------------------------------------------
  Manage dirvish backups with an underlying zfs storage pool
@@ -24,17 +24,17 @@
 
 
 SYNOPSIS
-========
+=========
 
-bkpmgmt COMMAND [OPTIONS]
+backupctl COMMAND [OPTIONS]
 
-bkpmgmt log
+backupctl log
 
-bkpmgmt [--help]
+backupctl [--help]
 
 
 DESCRIPTION
-===========
+============
 Tool to manage zfs volumes and create new dirvish vault configurations. This
 tool depends on a already present zfs pool, normally called backup.
 This tool should be run with root privileges, if not possible, at least zfs
@@ -44,31 +44,31 @@ the kernel module.
 
 
 COMMANDS
-========
+=========
 All subcommands that modify zfs volumes and dirvish configurations.
 
 new -n customer [-v server/vault] [-s size]
--------------------------------------------
+--------------------------------------------
 Create a new customer zfs volume or a new dirvish vault inside a customer.
 
 resize -n customer [-v server/vault] -s size
---------------------------------------------
+---------------------------------------------
 Resize an existing customer zfs volume or dirvish vault inside a customer.
 Shrinking is supported too.
 
 remove -n customer [-v server/vault]
-------------------------------------
+-------------------------------------
 Remove an existing customer zfs volume or dirvish vault inside a customer.
 If removing a customer, all dirvish vaults inside this customer will be removed
 too.
 
 log
----
+----
 Show the history of generating, resizing and removing customers and servers.
 
 
 OPTIONS
-=======
+========
 
 -v, --vault             Specify the hostname of the dirvish vault name.
 --dirvish-client        Specify a client ip or fqdn to back up. Needed if
@@ -81,55 +81,55 @@ OPTIONS
 
 
 EXAMPLES
-========
+=========
 
 CUSTOMER MANAGEMENT
--------------------
+--------------------
 
 Create a new customer with a quota of 10G.
 
-  bkpmgmt new -n customer1 -s 10G
+  backupctl new -n customer1 -s 10G
 
 Resize the quota of an existing customer to 20G.
 
-  bkpmgmt resize -n customer1 -s 20G
+  backupctl resize -n customer1 -s 20G
 
 Remove a customer with all his servers. All data will be lost.
 
-  bkpmgmt remove -n customer1
+  backupctl remove -n customer1
 
 SERVER MANAGEMENT
------------------
+------------------
 
 Create a new server/vault www.example.com for customer1 with no special quota
 (it will inherit the quota of the customer).
 
-  bkpmgmt new -n customer1 -v www.example.com
+  backupctl new -n customer1 -v www.example.com
 
 Create a new server/vault www.example.com for customer1 with a quota of 10G.
 Data inside this server will also count on the customer level).
 
-  bkpmgmt new -n customer1 -v www.example.com -s 10G
+  backupctl new -n customer1 -v www.example.com -s 10G
 
 Create a new server/vault www.example.com which isn't directly accessible, so a
 special dirvish client is needed, in this case the server is reachable with the
 ip address 192.0.2.100.
 
-  bkpmgmt new -n customer1 -v www.example.com -s 10G --dirvish-client 192.0.2.100
+  backupctl new -n customer1 -v www.example.com -s 10G --dirvish-client 192.0.2.100
 
 Resize the quota of the server/vault www.example.com of customer1 to the size
 of 20G.
 
-  bkpmgmt resize -n customer1 -v www.example.com -s 20G
+  backupctl resize -n customer1 -v www.example.com -s 20G
 
 Remove the server/vault www.example.com of customer1, this will delete all the
 backups and also the dirvish configuration for this server.
 
-  bkpmgmt remove -n customer1 -v www.example.com
+  backupctl remove -n customer1 -v www.example.com
 
 
 EXIT STATUS
-===========
+============
 The following exit values are returned:
 
 0
@@ -147,25 +147,25 @@ No command was given.
 
 
 FILES
-=====
+======
 
-/etc/bkpmgmt.ini
-----------------
+/etc/backupctl.ini
+-------------------
 System-wide configuration file.
 
-~/.config/bkpmgmt.ini
----------------------
+~/.config/backupctl.ini
+------------------------
 User specific configuration file. Will only be read if system-wide
 configuration doesn't exist. If it doesn't exist it will be created with
 default values.
 
-/var/lib/bkpmgmt.db
--------------------
-Bkpmgmt history database. This is an sqlite3 database.
+/var/lib/backupctl.db
+----------------------
+backupctl history database. This is an sqlite3 database.
 
 
 SEE ALSO
-========
+=========
 
 ``dirvish(8)``
 

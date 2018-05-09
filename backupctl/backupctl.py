@@ -8,10 +8,10 @@ import os
 import sqlite3
 import sys
 
-from bkpmgmt import dirvish, history, zfs
+from backupctl import dirvish, history, zfs
 
-CONFIG_USER = '~/.config/bkpmgmt.ini'
-CONFIG_SYSTEM = '/etc/bkpmgmt.ini'
+CONFIG_USER = '~/.config/backupctl.ini'
+CONFIG_SYSTEM = '/etc/backupctl.ini'
 
 LOG = logging.getLogger(__name__)
 LOG.addHandler(logging.StreamHandler())
@@ -33,7 +33,7 @@ def main():
         "command",
         help="""\
         All subcommands that modify zfs file system and dirvish configurations.
-        See the manpage (man 8 bkpmgmt) for more inforation.
+        See the manpage (man 8 backupctl) for more inforation.
         """,
     )
     parser.add_argument(
@@ -123,7 +123,7 @@ def config():
     """
     cfg = configparser.ConfigParser()
     cfg['database'] = {
-        'path': '/var/lib/bkpmgmt.db',
+        'path': '/var/lib/backupctl.db',
     }
     cfg['zfs'] = {
         'pool': 'backup',

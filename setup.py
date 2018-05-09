@@ -9,7 +9,7 @@ from setuptools import find_packages, setup
 here = path.abspath(path.dirname(__file__))
 
 __version__ = None
-version_file = path.join(here, "bkpmgmt", "version.py")
+version_file = path.join(here, "backupctl", "version.py")
 with codecs.open(version_file, encoding="UTF-8") as f:
     code = compile(f.read(), version_file, 'exec')
     exec(code)
@@ -18,7 +18,7 @@ with codecs.open('README.rst', 'r', encoding='UTF-8') as f:
     README_TEXT = f.read()
 
 setup(
-    name='bkpmgmt',
+    name='backupctl',
     version=__version__,
     author='Adfinis SyGroup AG',
     author_email='https://www.adfinis-sygroup.ch/',
@@ -44,6 +44,6 @@ setup(
     ],
     entry_points="""
     [console_scripts]
-    bkpmgmt=bkpmgmt.bkpmgmt:main
+    backupctl=backupctl.backupctl:main
     """
 )

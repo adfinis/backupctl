@@ -1,16 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 
-"""Test for class bkpmgmt"""
+"""Test for class backupctl"""
 
 import pytest
 
-from bkpmgmt import bkpmgmt, history
+from backupctl import backupctl, history
 
 
 @pytest.fixture(autouse=True)
 def hist():
-    hist_obj = history.History('/tmp/bkpmgmt.db')
+    hist_obj = history.History('/tmp/backupctl.db')
     return hist_obj
 
 
@@ -30,7 +30,7 @@ def mock_zfs(mocker):
     def mocked(cmd):
         commands.append(cmd)
         return mock_data['-'.join(cmd[:2])]
-    mocker.patch('bkpmgmt.zfs.execute_cmd', mocked)
+    mocker.patch('backupctl.zfs.execute_cmd', mocked)
     yield commands
 
 
@@ -54,14 +54,14 @@ def mock_zfs(mocker):
 ])
 def test_main(parameters, exit_code, mocker, mock_zfs):
     mocker.patch('sys.argv', [
-        'bkpmgmt.py',
+        'backupctl.py',
     ] + parameters)
 
     def mocked():
         import configparser
         cfg = configparser.ConfigParser()
         cfg['database'] = {
-            'path': '/tmp/bkpmgmt.db',
+            'path': '/tmp/backupctl.db',
         }
         cfg['zfs'] = {
             'pool': 'backup',
@@ -69,15 +69,15 @@ def test_main(parameters, exit_code, mocker, mock_zfs):
         }
         return cfg
 
-    mocker.patch('bkpmgmt.bkpmgmt.config', mocked)
+    mocker.patch('backupctl.backupctl.config', mocked)
     with pytest.raises(SystemExit) as pytest_wrapped_e:
-        bkpmgmt.main()
+        backupctl.main()
     assert pytest_wrapped_e.type == SystemExit
     assert pytest_wrapped_e.value.code == exit_code
 
 
 def test_config():
-    cfg = bkpmgmt.config()
+    cfg = backupctl.config()
     import configparser
     assert type(cfg) == configparser.ConfigParser
     assert type(cfg['database']['path']) == str
@@ -86,7 +86,7 @@ def test_config():
 
 
 def test_customer(mock_zfs):
-    bkpmgmt.new(
+    backupctl.new(
         hist(),
         pool='backup',
         root='/tmp/backup',
@@ -94,13 +94,13 @@ def test_customer(mock_zfs):
         size='1G',
         client=None,
     )
-    bkpmgmt.resize(
+    backupctl.resize(
         hist(),
         pool='backup',
         customer='customer1',
         size='2G',
     )
-    bkpmgmt.remove(
+    backupctl.remove(
         hist(),
         pool='backup',
         customer='customer1',
@@ -152,7 +152,7 @@ def test_customer(mock_zfs):
 
 
 def test_vault(mock_zfs):
-    bkpmgmt.new(
+    backupctl.new(
         hist(),
         pool='backup',
         root='/tmp/backup',
@@ -160,7 +160,7 @@ def test_vault(mock_zfs):
         size='1G',
         client=None,
     )
-    bkpmgmt.new(
+    backupctl.new(
         hist(),
         pool='backup',
         root='/tmp/backup',
@@ -169,7 +169,7 @@ def test_vault(mock_zfs):
         size='500M',
         client=None,
     )
-    bkpmgmt.new(
+    backupctl.new(
         hist(),
         pool='backup',
         root='/tmp/backup',
@@ -178,20 +178,20 @@ def test_vault(mock_zfs):
         size='500M',
         client='192.0.2.1',
     )
-    bkpmgmt.resize(
+    backupctl.resize(
         hist(),
         pool='backup',
         customer='customer1',
         vault='mail.example.com',
         size='200M',
     )
-    bkpmgmt.remove(
+    backupctl.remove(
         hist(),
         pool='backup',
         customer='customer1',
         vault='mail.example.com',
     )
-    bkpmgmt.remove(
+    backupctl.remove(
         hist(),
         pool='backup',
         customer='customer1',
@@ -283,7 +283,7 @@ def test_vault(mock_zfs):
 
 @pytest.mark.xfail
 def test_new_no_customer():
-    bkpmgmt.new(
+    backupctl.new(
         hist(),
         customer=None,
         vault=None,
@@ -294,7 +294,7 @@ def test_new_no_customer():
 
 @pytest.mark.xfail
 def test_new_no_vault_or_size():
-    bkpmgmt.new(
+    backupctl.new(
         hist(),
         customer='customer1',
         vault=None,
@@ -305,7 +305,7 @@ def test_new_no_vault_or_size():
 
 @pytest.mark.xfail
 def test_resize_no_customer():
-    bkpmgmt.resize(
+    backupctl.resize(
         hist(),
         customer=None,
         vault=None,
@@ -315,7 +315,7 @@ def test_resize_no_customer():
 
 @pytest.mark.xfail
 def test_resize_no_size():
-    bkpmgmt.resize(
+    backupctl.resize(
         hist(),
         customer='customer1',
         vault=None,
@@ -325,7 +325,7 @@ def test_resize_no_size():
 
 @pytest.mark.xfail
 def test_remove_no_customer():
-    bkpmgmt.remove(
+    backupctl.remove(
         hist(),
         customer=None,
         vault=None,
@@ -333,4 +333,4 @@ def test_remove_no_customer():
 
 
 def test_history_show():
-    bkpmgmt.history_show(hist())
+    backupctl.history_show(hist())

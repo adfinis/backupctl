@@ -5,12 +5,12 @@
 
 import pytest
 
-from bkpmgmt import history
+from backupctl import history
 
 
 @pytest.fixture(autouse=True)
 def hist():
-    hist_obj = history.History('/tmp/bkpmgmt.db')
+    hist_obj = history.History('/tmp/backupctl.db')
     return hist_obj
 
 
