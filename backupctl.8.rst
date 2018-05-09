@@ -9,7 +9,7 @@
 :Author:
     Written by Tobias Rueetschi, Adfinis SyGroup AG.
 :Date:
-    April 2018
+    May 2018
 :Copyright:
     Copyright 2018 Adfinis SyGroup AG License GPLv3+:
     GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.
@@ -156,9 +156,13 @@ System-wide configuration file.
 
 ~/.config/backupctl.ini
 ------------------------
-User specific configuration file. Will only be read if system-wide
-configuration doesn't exist. If it doesn't exist it will be created with
-default values.
+User specific configuration file. Will overwrite the configuration options of
+the system-wide configuration file.
+
+$PWD/backupctl.ini
+------------------------
+Local configuration file. Will overwrite the configuration options of any
+previous configuration file.
 
 /var/lib/backupctl/backupctl.db
 --------------------------------
@@ -168,6 +172,7 @@ backupctl history database. This is an sqlite3 database.
 SEE ALSO
 =========
 
-``dirvish(8)``
+* ``backupctl.ini(5)``, backupctl configuration file
+* ``dirvish(8)``, dirvish backup utility
 
 .. vim: set et ts=2 sw=2 :
