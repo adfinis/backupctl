@@ -5,10 +5,11 @@
 
 import os
 
-from backupctl import dirvish
+from backupctl.dirvish import Dirvish
 
 
 def test_dirvish_config():
+    dirvish = Dirvish()
     assert dirvish.create_config(
         os.path.join(
             os.sep,
