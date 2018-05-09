@@ -88,6 +88,7 @@ def main():
         try:
             new(
                 hist,
+                cfg['database']['path'],
                 cfg['zfs']['pool'],
                 cfg['zfs']['root'],
                 args.customer,
@@ -162,10 +163,12 @@ def config():
     return cfg
 
 
-def new(hist, pool, root, customer, vault=None, size=None, client=None):
+def new(hist, dbpath, pool, root, customer, vault=None, size=None,
+        client=None):
     """Create a new customer or a new vault/server.
 
     :param history.History hist:    History database.
+    :param string dbpath:           Path to the backupctl database.
     :param string pool:             ZFS pool name.
     :param string root:             Backup root path.
     :param string customer:         Customer name.
@@ -194,7 +197,7 @@ def new(hist, pool, root, customer, vault=None, size=None, client=None):
         if vault is not None:
             if client is None:
                 client = vault
-            dirvish = Dirvish()
+            dirvish = Dirvish(dbpath)
             dirvish.create_config(
                 root,
                 customer,

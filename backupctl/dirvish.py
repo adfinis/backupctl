@@ -3,6 +3,7 @@
 
 import logging
 import os
+import sqlite3
 
 import jinja2
 
@@ -11,9 +12,13 @@ logger = logging.getLogger(__name__)
 
 class Dirvish:
     """Create dirvish configuration and handle dirvish server triggers.
+
+    :ivar string dbpath: Path to the backupctl database.
+
+    :raises sqlite3.OperationalError: if couldn't open the database.
     """
 
-    def __init__(self):
+    def __init__(self, dbpath):
         self._excludes_default = [
             '/dev/*',
             '/tmp/*',
@@ -29,6 +34,38 @@ class Dirvish:
             'lost+found/',
             '*~',
         ]
+        self._path = None
+        self._conn = None
+
+        self._path = dbpath
+        self._conn = sqlite3.connect(self._path)
+        logger.debug(
+            "Opened database {0} successfully".format(self._path)
+        )
+        self._conn.execute(
+            '''CREATE TABLE IF NOT EXISTS servers
+                (
+                    id            INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                    name          TEXT                              NOT NULL,
+                    vault         TEXT                              NOT NULL,
+                    backupserver  TEXT                              NOT NULL,
+                    enabled       INTEGER                           NOT NULL
+                )
+            ;'''
+        )
+        self._conn.execute(
+            '''CREATE TABLE IF NOT EXISTS backups
+                (
+                    id            INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                    server_id     INTEGER,
+                    start         DATETIME,
+                    end           DATETIME,
+                    status        TEXT,
+                    FOREIGN KEY(server_id) REFERENCES servers(id)
+                )
+            ;'''
+        )
+        self._conn.commit()
 
     def create_config(self, root, customer, vault, client, excludes=None):
         """Create default dirvish configuration.
