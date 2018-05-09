@@ -10,7 +10,8 @@ import sys
 
 from xdg import BaseDirectory
 
-from backupctl import dirvish, history, zfs
+from backupctl import history, zfs
+from backupctl.dirvish import Dirvish
 
 LOG = logging.getLogger(__name__)
 LOG.addHandler(logging.StreamHandler())
@@ -191,6 +192,7 @@ def new(hist, pool, root, customer, vault=None, size=None, client=None):
         if vault is not None:
             if client is None:
                 client = vault
+            dirvish = Dirvish()
             dirvish.create_config(
                 root,
                 customer,
