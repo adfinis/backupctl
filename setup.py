@@ -46,5 +46,7 @@ setup(
     entry_points="""
     [console_scripts]
     backupctl=backupctl.backupctl:main
+    backupctl-start=backupctl.backupctl:backup_start
+    backupctl-stop=backupctl.backupctl:backup_stop
     """
 )

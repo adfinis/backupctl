@@ -122,3 +122,22 @@ class Dirvish:
             )
         )
         return True
+
+    def backup_start(self):
+        """Add an entry to the database when a dirvish backup is started.
+
+        This function should be triggered by dirvish pre-server.
+        """
+        dirvish_server = os.environ.get('DIRVISH_SERVER', None)
+        dirvish_client = os.environ.get('DIRVISH_CLIENT', None)
+        dirvish_image = os.environ.get('DIRVISH_IMAGE', None)
+
+    def backup_stop(self):
+        """Add an entry to the database when a dirvish backup is stopped.
+
+        This function should be triggered by dirvish post-server.
+        """
+        dirvish_server = os.environ.get('DIRVISH_SERVER', None)
+        dirvish_client = os.environ.get('DIRVISH_CLIENT', None)
+        dirvish_image = os.environ.get('DIRVISH_IMAGE', None)
+        dirvish_status = os.environ.get('DIRVISH_STATUS', None)

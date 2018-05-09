@@ -138,6 +138,33 @@ def main():
     sys.exit(0)
 
 
+def backup_start():
+    """Add an entry to the database when a dirvish backup is started.
+
+    This function should be triggered by dirvish pre-server.
+    """
+    dirvish_server = os.environ.get('DIRVISH_SERVER', None)
+    dirvish_client = os.environ.get('DIRVISH_CLIENT', None)
+    dirvish_image = os.environ.get('DIRVISH_IMAGE', None)
+    cfg = config()
+    dirvish = Dirvish(cfg['database'].get('path'))
+    dirvish.backup_start()
+
+
+def backup_stop():
+    """Add an entry to the database when a dirvish backup is stopped.
+
+    This function should be triggered by dirvish post-server.
+    """
+    dirvish_server = os.environ.get('DIRVISH_SERVER', None)
+    dirvish_client = os.environ.get('DIRVISH_CLIENT', None)
+    dirvish_image = os.environ.get('DIRVISH_IMAGE', None)
+    dirvish_status = os.environ.get('DIRVISH_STATUS', None)
+    cfg = config()
+    dirvish = Dirvish(cfg['database'].get('path'))
+    dirvish.backup_stop()
+
+
 def config():
     """Read the configuration files. If no configuration exists, write the
     default configuration to the directory ~/.config.
