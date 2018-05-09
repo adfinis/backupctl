@@ -13,6 +13,9 @@
 
 # Man pages
 /backupctl.?
+/backupctl.?.gz
+/backupctl.ini.?
+/backupctl.ini.?.gz
 
 # Configuration
 /backupctl.ini

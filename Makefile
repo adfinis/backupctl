@@ -1,12 +1,16 @@
-PROJECT := backupctl
+PROJECT	:= backupctl
+MANPAGES	:= $(PROJECT).8.gz $(PROJECT).ini.5.gz
 
-man: backupctl.8
+man: $(MANPAGES)
 
-$(PROJECT).8: README.rst
+$(PROJECT).%: $(PROJECT).%.rst
 	rst2man.py $< > $@
 
+%.gz: %
+	gzip -c $< > $@
+
 clean:
-	rm -rf build/ dist/ *.egg-info
+	rm -rf build/ dist/ *.egg-info $(MANPAGES) $(patsubst %.gz, %, $(MANPAGES))
 
 test:
 	isort -df -vb -ns "__init__.py" -sg "" -s "" -rc -c -p $(PROJECT) $(PROJECT)
