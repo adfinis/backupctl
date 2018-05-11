@@ -43,7 +43,8 @@ class Dirvish:
             "Opened database {0} successfully".format(self._path)
         )
         self._conn.execute(
-            '''CREATE TABLE IF NOT EXISTS servers
+            '''
+            CREATE TABLE IF NOT EXISTS servers
                 (
                     id            INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
                     name          TEXT                              NOT NULL,
@@ -54,7 +55,8 @@ class Dirvish:
             ;'''
         )
         self._conn.execute(
-            '''CREATE TABLE IF NOT EXISTS backups
+            '''
+            CREATE TABLE IF NOT EXISTS backups
                 (
                     id            INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
                     server_id     INTEGER,
@@ -123,21 +125,112 @@ class Dirvish:
         )
         return True
 
-    def backup_start(self):
-        """Add an entry to the database when a dirvish backup is started.
+    def server_add(self, name, vault, backupserver):
+        """Add a server to the list of servers to backup if it doesn't exist.
 
-        This function should be triggered by dirvish pre-server.
+        :param string name:         Server name.
+        :param string vault:        Dirvish vault name.
+        :param string backupserver: Name of the backup server.
+
+        :returns: 1 if a server was added, 0 if the server existed.
+        :rtype: int
         """
-        dirvish_server = os.environ.get('DIRVISH_SERVER', None)
-        dirvish_client = os.environ.get('DIRVISH_CLIENT', None)
-        dirvish_image = os.environ.get('DIRVISH_IMAGE', None)
+        cur = self._conn.cursor()
+        cur.execute(
+            '''
+            SELECT COUNT(*) FROM servers
+            WHERE name=? AND vault=? AND backupserver=?
+            ;''', (
+                name,
+                vault,
+                backupserver,
+            )
+        )
+        try:
+            count = cur.fetchall()[0][0]
+        except KeyError as e:
+            logger.warn(
+                "Couldn't get the count, assume no server is existing!"
+            )
+            count = 0
 
-    def backup_stop(self):
-        """Add an entry to the database when a dirvish backup is stopped.
+        if count == 0:
+            self._conn.execute(
+                '''
+                INSERT INTO servers
+                    (
+                        name,
+                        vault,
+                        backupserver,
+                        enabled
+                    )
+                VALUES
+                    (
+                        ?,
+                        ?,
+                        ?,
+                        1
+                    )
+                ;''', (
+                    name,
+                    vault,
+                    backupserver,
+                )
+            )
+        else:
+            cur = self._conn.cursor()
+            cur.execute(
+                '''
+                SELECT COUNT(*) FROM servers
+                WHERE name=? AND vault=? AND backupserver=? AND enabled=0
+                ;''', (
+                    name,
+                    vault,
+                    backupserver,
+                )
+            )
+            try:
+                count = cur.fetchall()[0][0]
+            except KeyError as e:
+                logger.warn(
+                    "Couldn't get the count, assume no server is existing!"
+                )
+                count = 0
+            if count == 1:
+                self._conn.execute(
+                    '''
+                    UPDATE servers
+                    SET enabled=1
+                    WHERE name=? AND vault=? AND backupserver=?
+                    ;''', (
+                        name,
+                        vault,
+                        backupserver,
+                    )
+                )
+            else:
+                return 0
 
-        This function should be triggered by dirvish post-server.
+        self._conn.commit()
+        return 1
+
+    def server_disable(self, name, vault, backupserver):
+        """Disable a server in the list of servers to backup.
+
+        :param string name:         Server name.
+        :param string vault:        Dirvish vault name.
+        :param string backupserver: Name of the backup server.
         """
-        dirvish_server = os.environ.get('DIRVISH_SERVER', None)
-        dirvish_client = os.environ.get('DIRVISH_CLIENT', None)
-        dirvish_image = os.environ.get('DIRVISH_IMAGE', None)
-        dirvish_status = os.environ.get('DIRVISH_STATUS', None)
+        self._conn.execute(
+            '''
+            UPDATE servers
+            SET enabled=0
+            WHERE name=? AND vault=? AND backupserver=?
+            ;''', (
+                name,
+                vault,
+                backupserver,
+            )
+        )
+        self._conn.commit()
+        return True

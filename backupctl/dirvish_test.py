@@ -32,18 +32,24 @@ def test_dirvish_config():
     )
 
 
-def test_dirvish_start():
+def test_server_add():
     dirvish = Dirvish(BACKUPCTL_DB)
-    os.environ['DIRVISH_SERVER'] = 'backup.example.com'
-    os.environ['DIRVISH_CLIENT'] = 'client.example.com'
-    os.environ['DIRVISH_IMAGE'] = 'client.example.com:default:2018-05-09_14:01'
-    dirvish.backup_start()
+    assert dirvish.server_add(
+        'test.example.com',
+        'example/test.example.com',
+        'backup.example.com',
+    ) == 1
+    assert dirvish.server_add(
+        'test.example.com',
+        'example/test.example.com',
+        'backup.example.com',
+    ) == 0
 
 
-def test_dirvish_stop():
+def test_server_disable():
     dirvish = Dirvish(BACKUPCTL_DB)
-    os.environ['DIRVISH_SERVER'] = 'backup.example.com'
-    os.environ['DIRVISH_CLIENT'] = 'client.example.com'
-    os.environ['DIRVISH_IMAGE'] = 'client.example.com:default:2018-05-09_14:01'
-    os.environ['DIRVISH_STATUS'] = 'success'
-    dirvish.backup_stop()
+    assert dirvish.server_disable(
+        'test.example.com',
+        'example/test.example.com',
+        'backup.example.com',
+    )
