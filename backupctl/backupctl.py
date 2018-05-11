@@ -74,13 +74,10 @@ def main():
 
     cfg = config()
     try:
-        hist = history.History(cfg['database'].get(
-            'path',
-            '/var/lib/backupctl/backupctl.db',
-        ))
+        hist = history.History(cfg['database'].get('path'))
     except sqlite3.OperationalError as e:
         LOG.error("Couldn't open database {0}. Exit now.".format(
-            cfg['database']['path'],
+            cfg['database'].get('path'),
         ))
         sys.exit(1)
 
@@ -148,6 +145,18 @@ def config():
     cfg.read(os.path.join(os.sep, 'etc', 'backupctl.db'))
     cfg.read(os.path.join(xdg.XDG_CONFIG_HOME, 'backupctl.ini'))
     cfg.read('backupctl.ini')
+
+    if not cfg.has_section('database'):
+        cfg.add_section('database')
+    if not cfg.has_option('database', 'path'):
+        cfg['database']['path'] = os.path.join(
+            os.sep,
+            'var',
+            'lib',
+            'backupctl',
+            'backupctl.db',
+        )
+
     return cfg
 
 

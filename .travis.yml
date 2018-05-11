@@ -11,6 +11,9 @@ install:
   - pip install .
   - pip install -r requirements.txt
 
+before_script:
+  - cp -v .travis/backupctl.ini backupctl.ini
+
 script:
   - make test
   - make man
