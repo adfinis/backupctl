@@ -153,9 +153,9 @@ def config():
             os.sep,
             'var',
             'lib',
+            'backupctl',
             'backupctl.db',
         )
-
     return cfg
 
 
