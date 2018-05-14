@@ -1,0 +1,6 @@
+[database]
+path = /var/lib/backupctl.db
+
+[zfs]
+pool = backup
+root = /srv/backup

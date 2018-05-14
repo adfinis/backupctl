@@ -13,3 +13,6 @@
 
 # Man pages
 /backupctl.?
+
+# Configuration
+/backupctl.ini

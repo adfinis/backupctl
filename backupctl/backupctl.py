@@ -8,10 +8,9 @@ import os
 import sqlite3
 import sys
 
-from backupctl import dirvish, history, zfs
+import xdg
 
-CONFIG_USER = '~/.config/backupctl.ini'
-CONFIG_SYSTEM = '/etc/backupctl.ini'
+from backupctl import dirvish, history, zfs
 
 LOG = logging.getLogger(__name__)
 LOG.addHandler(logging.StreamHandler())
@@ -75,38 +74,59 @@ def main():
 
     cfg = config()
     try:
-        hist = history.History(cfg['database']['path'])
+        hist = history.History(cfg['database'].get('path'))
     except sqlite3.OperationalError as e:
         LOG.error("Couldn't open database {0}. Exit now.".format(
-            cfg['database']['path'],
+            cfg['database'].get('path'),
         ))
         sys.exit(1)
 
     if args.command == 'new':
-        new(
-            hist,
-            cfg['zfs']['pool'],
-            cfg['zfs']['root'],
-            args.customer,
-            args.vault,
-            args.size,
-            args.dirvish_client,
-        )
+        try:
+            new(
+                hist,
+                cfg['zfs']['pool'],
+                cfg['zfs']['root'],
+                args.customer,
+                args.vault,
+                args.size,
+                args.dirvish_client,
+            )
+        except KeyError as e:
+            LOG.error(
+                "ZFS Pool and ZFS Root must be specified in the "
+                "configuration file. Exit now."
+            )
+            sys.exit(1)
     elif args.command == 'resize':
-        resize(
-            hist,
-            cfg['zfs']['pool'],
-            args.customer,
-            args.vault,
-            args.size,
-        )
+        try:
+            resize(
+                hist,
+                cfg['zfs']['pool'],
+                args.customer,
+                args.vault,
+                args.size,
+            )
+        except KeyError as e:
+            LOG.error(
+                "ZFS Pool must be specified in the configuration file. "
+                "Exit now."
+            )
+            sys.exit(1)
     elif args.command == 'remove':
-        remove(
-            hist,
-            cfg['zfs']['pool'],
-            args.customer,
-            args.vault,
-        )
+        try:
+            remove(
+                hist,
+                cfg['zfs']['pool'],
+                args.customer,
+                args.vault,
+            )
+        except KeyError as e:
+            LOG.error(
+                "ZFS Pool must be specified in the configuration file. "
+                "Exit now."
+            )
+            sys.exit(1)
     elif args.command == 'log':
         history_show(hist)
     else:
@@ -122,22 +142,20 @@ def config():
     :rtype: `configparser.ConfigParser`
     """
     cfg = configparser.ConfigParser()
-    cfg['database'] = {
-        'path': '/var/lib/backupctl.db',
-    }
-    cfg['zfs'] = {
-        'pool': 'backup',
-        'root': '/srv/backup',
-    }
-    try:
-        cfg.read_file(open(os.path.expanduser(CONFIG_USER)))
-    except FileNotFoundError as e:
-        try:
-            cfg.read_file(open(CONFIG_SYSTEM))
-        except FileNotFoundError as e:
-            with open(os.path.expanduser(CONFIG_USER), 'w') as configfile:
-                cfg.write(configfile)
-            LOG.warn('New configuration written to {0}'.format(CONFIG_USER))
+    cfg.read(os.path.join(os.sep, 'etc', 'backupctl.db'))
+    cfg.read(os.path.join(xdg.XDG_CONFIG_HOME, 'backupctl.ini'))
+    cfg.read('backupctl.ini')
+
+    if not cfg.has_section('database'):
+        cfg.add_section('database')
+    if not cfg.has_option('database', 'path'):
+        cfg['database']['path'] = os.path.join(
+            os.sep,
+            'var',
+            'lib',
+            'backupctl.db',
+        )
+
     return cfg
 
 
