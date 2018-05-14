@@ -2,17 +2,35 @@
  backupctl
 ===========
 
-Manage dirvish backups with an underlying zfs storage pool.
+------------------------------------------------------------
+ Manage dirvish backups with an underlying zfs storage pool
+------------------------------------------------------------
+
+:Author:
+    Written by Tobias Rueetschi, Adfinis SyGroup AG.
+:Date:
+    May 2018
+:Copyright:
+    Copyright 2018 Adfinis SyGroup AG License GPLv3+:
+    GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.
+    This is free software: you are free to change and redistribute it.
+    There is NO WARRANTY, to the extent permitted by law.
+:Version:
+    1.0
+:Manual section:
+    8
+:Manual group:
+    System Manager's Manual
 
 
 SYNOPSIS
 =========
 
-``backupctl COMMAND [OPTIONS]``
+backupctl COMMAND [OPTIONS]
 
-``backupctl log``
+backupctl log
 
-``backupctl [--help]``
+backupctl [--help]
 
 
 DESCRIPTION
@@ -116,49 +134,45 @@ EXIT STATUS
 The following exit values are returned:
 
 0
-  Successful completion.
+--
+Successful completion.
 
 1
-  An error occurred.
+--
+An error occurred.
 
 
 2
-  No command was given.
+--
+No command was given.
 
 
 FILES
 ======
 
 /etc/backupctl.ini
-  System-wide configuration file.
+-------------------
+System-wide configuration file.
 
-$XDG_CONFIG_HOME/backupctl.ini
-  User specific configuration file. Will overwrite the configuration options of
-  the system-wide configuration file.
+~/.config/backupctl.ini
+------------------------
+User specific configuration file. Will overwrite the configuration options of
+the system-wide configuration file.
 
 $PWD/backupctl.ini
-  Local configuration file. Will overwrite the configuration options of any
-  previous configuration file.
+------------------------
+Local configuration file. Will overwrite the configuration options of any
+previous configuration file.
 
 /var/lib/backupctl/backupctl.db
-  backupctl history database. This is an sqlite3 database.
+--------------------------------
+backupctl history database. This is an sqlite3 database.
 
 
 SEE ALSO
 =========
 
-* `backupctl(8)`_, backupctl man page
-* `backupctl.ini(5)`_, backupctl configuration file
-
-
-Copyright
-==========
-Copyright 2018 Adfinis SyGroup AG License GPLv3+:
-GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.
-This is free software: you are free to change and redistribute it.
-There is NO WARRANTY, to the extent permitted by law.
-
-.. _backupctl(8): backupctl.8.rst
-.. _backupctl.ini(5): backupctl.ini.5.rst
+* ``backupctl.ini(5)``, backupctl configuration file
+* ``dirvish(8)``, dirvish backup utility
 
 .. vim: set et ts=2 sw=2 :
