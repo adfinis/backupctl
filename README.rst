@@ -132,7 +132,7 @@ FILES
 /etc/backupctl.ini
   System-wide configuration file.
 
-~/.config/backupctl.ini
+$XDG_CONFIG_HOME/backupctl.ini
   User specific configuration file. Will overwrite the configuration options of
   the system-wide configuration file.
 
@@ -140,7 +140,7 @@ $PWD/backupctl.ini
   Local configuration file. Will overwrite the configuration options of any
   previous configuration file.
 
-/var/lib/backupctl.db
+/var/lib/backupctl/backupctl.db
   backupctl history database. This is an sqlite3 database.
 
 
