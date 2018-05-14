@@ -94,7 +94,7 @@ def main():
             )
         except KeyError as e:
             LOG.error(
-                "ZFS Pool and ZFS Root must be specified in any "
+                "ZFS Pool and ZFS Root must be specified in the "
                 "configuration file. Exit now."
             )
             sys.exit(1)
@@ -109,7 +109,7 @@ def main():
             )
         except KeyError as e:
             LOG.error(
-                "ZFS Pool must be specified in any configuration file. "
+                "ZFS Pool must be specified in the configuration file. "
                 "Exit now."
             )
             sys.exit(1)
@@ -123,7 +123,7 @@ def main():
             )
         except KeyError as e:
             LOG.error(
-                "ZFS Pool must be specified in any configuration file. "
+                "ZFS Pool must be specified in the configuration file. "
                 "Exit now."
             )
             sys.exit(1)
@@ -153,7 +153,6 @@ def config():
             os.sep,
             'var',
             'lib',
-            'backupctl',
             'backupctl.db',
         )
 
