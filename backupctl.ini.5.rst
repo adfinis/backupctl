@@ -99,7 +99,7 @@ User specific configuration file. Will overwrite the configuration options of
 the system-wide configuration file.
 
 $PWD/backupctl.ini
-------------------------
+-------------------
 Local configuration file. Will overwrite the configuration options of any
 previous configuration file.
 
