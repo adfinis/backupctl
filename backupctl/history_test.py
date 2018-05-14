@@ -3,6 +3,8 @@
 
 """Test for class history"""
 
+import os
+
 import pytest
 
 from backupctl import history
@@ -10,7 +12,12 @@ from backupctl import history
 
 @pytest.fixture(autouse=True)
 def hist():
-    hist_obj = history.History('/tmp/backupctl.db')
+    hist_obj = history.History(os.path.join(
+        os.sep,
+        'tmp',
+        'backupctl',
+        'backupctl.db',
+    ))
     return hist_obj
 
 

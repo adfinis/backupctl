@@ -159,8 +159,8 @@ User specific configuration file. Will only be read if system-wide
 configuration doesn't exist. If it doesn't exist it will be created with
 default values.
 
-/var/lib/backupctl.db
-----------------------
+/var/lib/backupctl/backupctl.db
+--------------------------------
 backupctl history database. This is an sqlite3 database.
 
 

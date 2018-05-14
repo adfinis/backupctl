@@ -3,6 +3,8 @@
 
 """Test for class zfs"""
 
+import os
+
 import pytest
 
 from backupctl import zfs
@@ -30,7 +32,13 @@ def mock_zfs(mocker):
 def test_new_zfs_filesystem(mock_zfs):
     zfs.new_filesystem(
         'backup/backupctl-test1',
-        '/tmp/backupctl-test1',
+        os.path.join(
+            os.sep,
+            'tmp',
+            'backupctl',
+            'zfs',
+            'backupctl-test1',
+        ),
         '10M',
         compression=True,
     )
@@ -44,7 +52,13 @@ def test_new_zfs_filesystem(mock_zfs):
         '-o',
         'quota=10M',
         '-o',
-        'mountpoint=/tmp/backupctl-test1',
+        'mountpoint={0}'.format(os.path.join(
+            os.sep,
+            'tmp',
+            'backupctl',
+            'zfs',
+            'backupctl-test1',
+        )),
         'backup/backupctl-test1',
     ]]
 
@@ -52,7 +66,13 @@ def test_new_zfs_filesystem(mock_zfs):
 def test_new_zfs_filesystem_no_compression(mock_zfs):
     zfs.new_filesystem(
         'backup/backupctl-test1',
-        '/tmp/backupctl-test1',
+        os.path.join(
+            os.sep,
+            'tmp',
+            'backupctl',
+            'zfs',
+            'backupctl-test1',
+        ),
         '10M',
         compression=False,
     )
@@ -66,7 +86,13 @@ def test_new_zfs_filesystem_no_compression(mock_zfs):
         '-o',
         'quota=10M',
         '-o',
-        'mountpoint=/tmp/backupctl-test1',
+        'mountpoint={0}'.format(os.path.join(
+            os.sep,
+            'tmp',
+            'backupctl',
+            'zfs',
+            'backupctl-test1',
+        )),
         'backup/backupctl-test1',
     ]]
 

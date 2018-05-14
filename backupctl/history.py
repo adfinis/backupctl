@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import logging
+import os
 import sqlite3
 
 logger = logging.getLogger(__name__)
@@ -20,6 +21,9 @@ class History:
         self._conn = None
 
         self._path = dbpath
+        dirpath = os.path.dirname(self._path)
+        if not os.path.exists(dirpath):
+            os.makedirs(dirpath)
         self._conn = sqlite3.connect(self._path)
         logger.debug(
             "Opened database {0} successfully".format(self._path)

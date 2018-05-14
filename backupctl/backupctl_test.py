@@ -3,6 +3,8 @@
 
 """Test for class backupctl"""
 
+import os
+
 import pytest
 
 from backupctl import backupctl, history
@@ -10,7 +12,12 @@ from backupctl import backupctl, history
 
 @pytest.fixture(autouse=True)
 def hist():
-    hist_obj = history.History('/tmp/backupctl.db')
+    hist_obj = history.History(os.path.join(
+        os.sep,
+        'tmp',
+        'backupctl',
+        'backupctl.db',
+    ))
     return hist_obj
 
 
@@ -61,11 +68,21 @@ def test_main(parameters, exit_code, mocker, mock_zfs):
         import configparser
         cfg = configparser.ConfigParser()
         cfg['database'] = {
-            'path': '/tmp/backupctl.db',
+            'path': os.path.join(
+                os.sep,
+                'tmp',
+                'backupctl',
+                'backupctl.db',
+            )
         }
         cfg['zfs'] = {
             'pool': 'backup',
-            'root': '/tmp/backup',
+            'root': os.path.join(
+                os.sep,
+                'tmp',
+                'backupctl',
+                'backup',
+            )
         }
         return cfg
 
@@ -89,7 +106,7 @@ def test_customer(mock_zfs):
     backupctl.new(
         hist(),
         pool='backup',
-        root='/tmp/backup',
+        root=os.path.join(os.sep, 'tmp', 'backupctl', 'backup'),
         customer='customer1',
         size='1G',
         client=None,
@@ -116,7 +133,13 @@ def test_customer(mock_zfs):
             '-o',
             'quota=1G',
             '-o',
-            'mountpoint=/tmp/backup/customer1',
+            'mountpoint={0}'.format(os.path.join(
+                os.sep,
+                'tmp',
+                'backupctl',
+                'backup',
+                'customer1',
+            )),
             'backup/customer1',
         ],
         [
@@ -155,7 +178,7 @@ def test_vault(mock_zfs):
     backupctl.new(
         hist(),
         pool='backup',
-        root='/tmp/backup',
+        root=os.path.join(os.sep, 'tmp', 'backupctl', 'backup'),
         customer='customer1',
         size='1G',
         client=None,
@@ -163,7 +186,7 @@ def test_vault(mock_zfs):
     backupctl.new(
         hist(),
         pool='backup',
-        root='/tmp/backup',
+        root=os.path.join(os.sep, 'tmp', 'backupctl', 'backup'),
         customer='customer1',
         vault='www.example.com',
         size='500M',
@@ -172,7 +195,7 @@ def test_vault(mock_zfs):
     backupctl.new(
         hist(),
         pool='backup',
-        root='/tmp/backup',
+        root=os.path.join(os.sep, 'tmp', 'backupctl', 'backup'),
         customer='customer1',
         vault='mail.example.com',
         size='500M',
@@ -207,7 +230,13 @@ def test_vault(mock_zfs):
             '-o',
             'quota=1G',
             '-o',
-            'mountpoint=/tmp/backup/customer1',
+            'mountpoint={0}'.format(os.path.join(
+                os.sep,
+                'tmp',
+                'backupctl',
+                'backup',
+                'customer1',
+            )),
             'backup/customer1',
         ],
         [
@@ -220,7 +249,14 @@ def test_vault(mock_zfs):
             '-o',
             'quota=500M',
             '-o',
-            'mountpoint=/tmp/backup/customer1/www.example.com',
+            'mountpoint={0}'.format(os.path.join(
+                os.sep,
+                'tmp',
+                'backupctl',
+                'backup',
+                'customer1',
+                'www.example.com',
+            )),
             'backup/customer1/www.example.com',
         ],
         [
@@ -233,7 +269,14 @@ def test_vault(mock_zfs):
             '-o',
             'quota=500M',
             '-o',
-            'mountpoint=/tmp/backup/customer1/mail.example.com',
+            'mountpoint={0}'.format(os.path.join(
+                os.sep,
+                'tmp',
+                'backupctl',
+                'backup',
+                'customer1',
+                'mail.example.com',
+            )),
             'backup/customer1/mail.example.com',
         ],
         [

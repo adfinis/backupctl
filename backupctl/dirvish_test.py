@@ -3,11 +3,19 @@
 
 """Test for class dirvish"""
 
+import os
+
 from backupctl import dirvish
 
 
 def test_dirvish_config():
     assert dirvish.create_config(
-        '/tmp/backupctl/www.example.com',
+        os.path.join(
+            os.sep,
+            'tmp',
+            'backupctl',
+            'dirvish',
+            'www.example.com',
+        ),
         'www.example.com',
     )
