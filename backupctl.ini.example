@@ -1,5 +1,5 @@
 [database]
-path = /var/lib/backupctl.db
+path = /var/lib/backupctl/backupctl.db
 
 [zfs]
 pool = backup
