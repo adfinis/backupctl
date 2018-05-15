@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import argparse
@@ -8,7 +8,7 @@ import os
 import sqlite3
 import sys
 
-import xdg
+from xdg import BaseDirectory
 
 from backupctl import dirvish, history, zfs
 
@@ -143,7 +143,7 @@ def config():
     """
     cfg = configparser.ConfigParser()
     cfg.read(os.path.join(os.sep, 'etc', 'backupctl.db'))
-    cfg.read(os.path.join(xdg.XDG_CONFIG_HOME, 'backupctl.ini'))
+    cfg.read(os.path.join(BaseDirectory.xdg_config_home, 'backupctl.ini'))
     cfg.read('backupctl.ini')
 
     if not cfg.has_section('database'):
