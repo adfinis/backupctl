@@ -142,7 +142,7 @@ def config():
     :rtype: `configparser.ConfigParser`
     """
     cfg = configparser.ConfigParser()
-    cfg.read(os.path.join(os.sep, 'etc', 'backupctl.db'))
+    cfg.read(os.path.join(os.sep, 'etc', 'backupctl.ini'))
     cfg.read(os.path.join(BaseDirectory.xdg_config_home, 'backupctl.ini'))
     cfg.read('backupctl.ini')
 
