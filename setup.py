@@ -25,7 +25,7 @@ setup(
     description='Manage dirvish backups with an underlying zfs storage pool.',
     long_description=README_TEXT,
     install_requires=(
-        'xdg',
+        'pyxdg',
         'jinja2',
     ),
     keywords='dirvish, zfs',
