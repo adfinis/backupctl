@@ -55,7 +55,8 @@ Create a new customer zfs volume or a new dirvish vault inside a customer.
 resize -n customer [-v server/vault] -s size
 ---------------------------------------------
 Resize an existing customer zfs volume or dirvish vault inside a customer.
-Shrinking is supported too.
+Shrinking is supported too, if there are more data inside the vault, then an
+error will occur.
 
 remove -n customer [-v server/vault]
 -------------------------------------
@@ -79,6 +80,30 @@ OPTIONS
                         vaults.
 -s, --size              Quota of a customer or a server. Size can be written
                         human readable as MB, GB and so on.
+
+
+QUOTA
+======
+The data in a dirvish vault is used from the quota of the vault/server and of
+the customer. The quota of the customer should be equal or bigger as the one
+of the vault/server, if this isn't the case, then the quota of the customer
+can't be used in the full size. A quota is needed for each customer, but not
+for a vault/server.
+
+Example
+--------
+As an example, if the ZFS pool is 50 GB, there is one customer with 40 GB, and
+there are three vaults/servers with each 20 GB, each vault/server can use up to
+20 GB, if all three vaults/servers are not more than 40 GB.
+
+.. code-block::
+
+  NAME                               USED  AVAIL  REFER
+  backup                              35G    50G   205K
+  backup/customer1                    35G    40G   273K
+  backup/customer1/www1.example.com   10G    20G    10G
+  backup/customer1/www2.example.com   10G    20G    10G
+  backup/customer1/www3.example.com   15G    20G    15G
 
 
 EXAMPLES
