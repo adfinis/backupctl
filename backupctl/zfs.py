@@ -7,7 +7,7 @@ import subprocess
 logger = logging.getLogger(__name__)
 
 
-def new_filesystem(fs, path, size, compression=True):
+def new_filesystem(fs, path, size=None, compression=True):
     """Create a new zfs file system. The file system is automatically mounted
     according to the path property.
 
@@ -24,19 +24,25 @@ def new_filesystem(fs, path, size, compression=True):
         compression = 'compression=on'
     else:
         compression = 'compression=off'
-    returncode, stdout, stderr = execute_cmd([
-        'zfs',
-        'create',
-        '-o',
-        compression,
-        '-o',
-        'dedup=off',
-        '-o',
-        'quota={0}'.format(size),
-        '-o',
-        'mountpoint={0}'.format(path),
-        '{0}'.format(fs),
-    ])
+    if size is not None:
+        size = ['-o', 'quota={0}'.format(size)]
+    else:
+        size = []
+
+    returncode, stdout, stderr = execute_cmd(
+        [
+            'zfs',
+            'create',
+            '-o',
+            compression,
+            '-o',
+            'dedup=off',
+        ] + size + [
+            '-o',
+            'mountpoint={0}'.format(path),
+            '{0}'.format(fs),
+        ]
+    )
     if returncode == 0:
         logger.info('created zfs file system "{0}" successfully'.format(
             fs,
