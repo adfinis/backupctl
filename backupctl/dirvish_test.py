@@ -15,7 +15,8 @@ def test_dirvish_config():
             'tmp',
             'backupctl',
             'dirvish',
-            'www.example.com',
         ),
+        'example',
+        'www.example.com',
         'www.example.com',
     )

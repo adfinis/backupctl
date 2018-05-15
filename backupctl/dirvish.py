@@ -25,9 +25,11 @@ EXCLUDES_DEFAULT = [
 ]
 
 
-def create_config(vault, client, excludes=EXCLUDES_DEFAULT):
+def create_config(root, customer, vault, client, excludes=EXCLUDES_DEFAULT):
     """Create default dirvish configuration.
 
+    :param string root:     Backup root path.
+    :param string customer: Customer name.
     :param string vault:    Dirvish vault.
     :param string client:   Client fqdn or IP address.
 
@@ -37,7 +39,9 @@ def create_config(vault, client, excludes=EXCLUDES_DEFAULT):
     root_dir = os.path.dirname(os.path.abspath(__file__))
     config_path_j2 = os.path.join(root_dir, 'dirvish.conf.j2')
     config_root = os.path.join(
-        '{0}'.format(vault),
+        root,
+        customer,
+        vault,
         'dirvish',
     )
     config_path = os.path.join(
@@ -63,4 +67,14 @@ def create_config(vault, client, excludes=EXCLUDES_DEFAULT):
             config_path,
             e,
         ))
+    print(
+        'You should now edit the dirvish configuration and run an '
+        'initial backup.\n'
+        '$EDITOR {0}/{1}/{2}/dirvish/default.conf\n'
+        'dirvish --vault {1}/{2} --init\n'.format(
+            root,
+            customer,
+            vault,
+        )
+    )
     return True
