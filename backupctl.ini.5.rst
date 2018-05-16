@@ -76,7 +76,7 @@ EXAMPLES
 =========
 An basic example of the configuration file is:
 
-.. code-block:: ini
+.. code-block::
 
   [database]
   path = /var/lib/backupctl.db
