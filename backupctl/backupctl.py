@@ -192,7 +192,9 @@ def new(hist, pool, root, customer, vault=None, size=None, client=None):
             if client is None:
                 client = vault
             dirvish.create_config(
-                os.path.join(root, customer, vault),
+                root,
+                customer,
+                vault,
                 client,
             )
             hist.add(customer, 'config', vault)
