@@ -5,7 +5,13 @@ python:
   - 3.5
   - 3.6
 
+addons:
+  apt:
+    packages:
+      - python-docutils
+
 sudo: true
+cache: pip
 
 install:
   - pip install .
