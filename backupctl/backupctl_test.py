@@ -9,12 +9,12 @@ import pytest
 
 from backupctl import backupctl, history
 
-BACKUPCTL_DB = os.path.join(
+BACKUPCTL_DB = 'sqlite:///{0}'.format(os.path.join(
     os.sep,
     'tmp',
     'backupctl',
     'backupctl.db',
-)
+))
 
 
 @pytest.fixture(autouse=True)
@@ -72,12 +72,14 @@ def test_main(parameters, exit_code, mocker, mock_zfs):
         import configparser
         cfg = configparser.ConfigParser()
         cfg['database'] = {
+            'type': 'sqlite',
             'path': os.path.join(
                 os.sep,
                 'tmp',
                 'backupctl',
                 'backupctl.db',
-            )
+            ),
+            'fullpath': 'sqlite:////tmp/backupctl/backupctl.db',
         }
         cfg['zfs'] = {
             'pool': 'backup',
@@ -86,7 +88,7 @@ def test_main(parameters, exit_code, mocker, mock_zfs):
                 'tmp',
                 'backupctl',
                 'backup',
-            )
+            ),
         }
         return cfg
 
@@ -101,7 +103,9 @@ def test_config():
     cfg = backupctl.config()
     import configparser
     assert type(cfg) == configparser.ConfigParser
+    assert type(cfg['database']['type']) == str
     assert type(cfg['database']['path']) == str
+    assert type(cfg['database']['fullpath']) == str
     assert type(cfg['zfs']['pool']) == str
     assert type(cfg['zfs']['root']) == str
 

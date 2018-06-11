@@ -150,6 +150,8 @@ def config():
 
     if not cfg.has_section('database'):
         cfg.add_section('database')
+    if not cfg.has_option('database', 'type'):
+        cfg['database']['type'] = 'sqlite'
     if not cfg.has_option('database', 'path'):
         cfg['database']['path'] = os.path.join(
             os.sep,
@@ -157,6 +159,11 @@ def config():
             'lib',
             'backupctl',
             'backupctl.db',
+        )
+    if not cfg.has_option('database', 'fullpath'):
+        cfg['database']['fullpath'] = '{0}:///{1}'.format(
+            cfg['database'].get('type'),
+            cfg['database'].get('path'),
         )
     return cfg
 

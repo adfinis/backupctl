@@ -9,12 +9,12 @@ import pytest
 
 from backupctl import history
 
-BACKUPCTL_DB = os.path.join(
+BACKUPCTL_DB = 'sqlite:///{0}'.format(os.path.join(
     os.sep,
     'tmp',
     'backupctl',
     'backupctl.db',
-)
+))
 
 
 @pytest.fixture(autouse=True)
