@@ -2,42 +2,43 @@
 # -*- coding: utf-8 -*-
 
 import logging
-import sqlite3
+from datetime import datetime
+
+from sqlalchemy import Column, DateTime, Integer, String
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
 
 logger = logging.getLogger(__name__)
+Base = declarative_base()
+
+
+class HistoryEntry(Base):
+    __tablename__ = 'history'
+
+    id       = Column(Integer, primary_key=True)
+    datetime = Column(DateTime)
+    command  = Column(String)
+    customer = Column(String)
+    vault    = Column(String)
+    size     = Column(String)
+
+    def __repr__(self):
+        return "<Entry(id='{0}')>".format(self.id)
 
 
 class History:
     """Store and show history of commands done with the backupctl tool.
 
-    :ivar string dbpath: Path to the backupctl database. The directory must
-                         exist.
+    :ivar sqlalchemy.engine.base.Engine engine: SQLAlchemy engine.
 
-    :raises sqlite3.OperationalError: if couldn't open the database.
+    :raises sqlalchemy.exc.ArgumentError: Raised when an invalid or conflicting
+                                          function argument is supplied.
+    :raises sqlalchemy.exc.OperationalError: Wraps a DB-API OperationalError.
     """
 
-    def __init__(self, dbpath):
-        self._path = None
-        self._conn = None
-
-        self._path = dbpath
-        self._conn = sqlite3.connect(self._path)
-        logger.debug(
-            "Opened database {0} successfully".format(self._path)
-        )
-        self._conn.execute(
-            '''CREATE TABLE IF NOT EXISTS history
-                (
-                    id          INTEGER PRIMARY KEY AUTOINCREMENT   NOT NULL,
-                    datetime    REAL                                NOT NULL,
-                    command     TEXT                                NOT NULL,
-                    customer    TEXT                                NOT NULL,
-                    vault       TEXT,
-                    size        TEXT
-                )
-            ;'''
-        )
-        self._conn.commit()
+    def __init__(self, engine):
+        self._engine = engine
+        Base.metadata.create_all(engine)
 
     def add(self, customer, command, vault=None, size=None):
         """Add an entry to the history.
@@ -50,34 +51,25 @@ class History:
         :returns: True
         :rtype: bool
 
-        :raises sqlite3.OperationalError: if database schematic is wrong or
-        database is not writtable.
+        :raises sqlalchemy.exc.ArgumentError: Raised when an invalid or
+                                              conflicting function argument is
+                                              supplied.
+        :raises sqlalchemy.exc.OperationalError: Wraps a DB-API
+                                                 OperationalError.
         """
-        self._conn.execute(
-            '''INSERT INTO history
-                (
-                    datetime,
-                    command,
-                    customer,
-                    vault,
-                    size
-                )
-            VALUES
-                (
-                    julianday('now'),
-                    ?,
-                    ?,
-                    ?,
-                    ?
-                )
-            ;''', (
-                command,
-                customer,
-                vault,
-                size,
-            )
+        new_entry = HistoryEntry(
+            datetime=datetime.now(),
+            command=str(command),
+            customer=str(customer),
+            vault=str(vault),
+            size=str(size),
         )
-        self._conn.commit()
+
+        db_session = sessionmaker(bind=self._engine)
+        session = db_session()
+
+        session.add(new_entry)
+        session.commit()
         return True
 
     def show(self, count=20):
@@ -88,32 +80,37 @@ class History:
         :returns: A list of entries.
         :rtype: `list` of `string`
 
-        :raises sqlite3.OperationalError: if database schematic is wrong or
-        database is not readable.
+        :raises sqlalchemy.exc.ArgumentError: Raised when an invalid or
+                                              conflicting function argument is
+                                              supplied.
+        :raises sqlalchemy.exc.OperationalError: Wraps a DB-API
+                                                 OperationalError.
         """
+        Base.metadata.bind = self._engine
+        db_session = sessionmaker()
+        db_session.bind = self._engine
+        session = db_session()
+
         history_list = []
-        cur = self._conn.cursor()
-        cur.execute(
-            '''SELECT
-                date(datetime),
-                time(datetime),
-                command,
-                customer,
-                vault,
-                size
-            FROM history
-            ORDER BY datetime
-            LIMIT ?''',
-            (count,)
-        )
-        for row in cur:
-            dt = '{0}T{1}'.format(row[0], row[1])
-            command = row[2]
-            customer = ' customer "{0}"'.format(row[3]) if row[3] else ''
-            vault = ' vault "{0}"'.format(row[4]) if row[4] else ''
-            size = ' with size {0}'.format(row[5]) if row[5] else ''
+        entries = session.query(HistoryEntry).order_by(
+            HistoryEntry.datetime
+        )[-count:]
+
+        for entry in entries:
+            dt = str(entry.datetime)
+            command = '{0}'.format(entry.command)
+            customer = 'customer "{0}" '.format(entry.customer)
+            if entry.vault != "None":
+                vault = 'vault "{0}" '.format(entry.vault)
+            else:
+                vault = ''
+            if entry.size != "None":
+                size = 'with size {0} '.format(entry.size)
+            else:
+                size = ''
+
             history_list.append(
-                '{0} - {1}{2}{3}{4}'.format(
+                '{0} - {1} {2}{3}{4}'.format(
                     dt,
                     command,
                     customer,

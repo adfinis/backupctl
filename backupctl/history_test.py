@@ -6,22 +6,24 @@
 import os
 
 import pytest
+import sqlalchemy
 
 from backupctl import history
 
-BACKUPCTL_DB = 'sqlite:///{0}'.format(os.path.join(
+BACKUPCTL_DB = os.path.join(
     os.sep,
     'tmp',
     'backupctl',
     'backupctl.db',
-))
+)
 
 
 @pytest.fixture(autouse=True)
 def hist():
     if not os.path.exists(os.path.dirname(BACKUPCTL_DB)):
         os.makedirs(os.path.dirname(BACKUPCTL_DB))
-    hist_obj = history.History(BACKUPCTL_DB)
+    engine = sqlalchemy.create_engine('sqlite:///{0}'.format(BACKUPCTL_DB))
+    hist_obj = history.History(engine)
     return hist_obj
 
 

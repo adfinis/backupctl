@@ -5,9 +5,9 @@ import argparse
 import configparser
 import logging
 import os
-import sqlite3
 import sys
 
+import sqlalchemy
 from xdg import BaseDirectory
 
 from backupctl import dirvish, history, zfs
@@ -73,15 +73,29 @@ def main():
     args = parser.parse_args()
 
     cfg = config()
+
     if not os.path.exists(os.path.dirname(cfg['database'].get('path'))):
         os.makedirs(os.path.dirname(cfg['database'].get('path')))
+
     try:
-        hist = history.History(cfg['database'].get('path'))
-    except sqlite3.OperationalError as e:
+        engine = sqlalchemy.create_engine(cfg['database'].get('fullpath'))
+        LOG.debug(
+            "Opened database {0} successfully".format(
+                cfg['database'].get('fullpath'),
+            )
+        )
+    except sqlalchemy.exc.ArgumentError as e:
         LOG.error("Couldn't open database {0}. Exit now.".format(
-            cfg['database'].get('path'),
+            cfg['database'].get('fullpath'),
         ))
         sys.exit(1)
+    except sqlalchemy.exc.OperationalError as e:
+        LOG.error("Couldn't open database {0}. Exit now.".format(
+            cfg['database'].get('fullpath'),
+        ))
+        sys.exit(1)
+
+    hist = history.History(engine)
 
     if args.command == 'new':
         try:
