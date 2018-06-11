@@ -9,15 +9,19 @@ import pytest
 
 from backupctl import history
 
+BACKUPCTL_DB = os.path.join(
+    os.sep,
+    'tmp',
+    'backupctl',
+    'backupctl.db',
+)
+
 
 @pytest.fixture(autouse=True)
 def hist():
-    hist_obj = history.History(os.path.join(
-        os.sep,
-        'tmp',
-        'backupctl',
-        'backupctl.db',
-    ))
+    if not os.path.exists(os.path.dirname(BACKUPCTL_DB)):
+        os.makedirs(os.path.dirname(BACKUPCTL_DB))
+    hist_obj = history.History(BACKUPCTL_DB)
     return hist_obj
 
 
