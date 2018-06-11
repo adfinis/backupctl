@@ -74,6 +74,8 @@ def main():
     args = parser.parse_args()
 
     cfg = config()
+    if not os.path.exists(os.path.dirname(cfg['database'].get('path'))):
+        os.makedirs(os.path.dirname(cfg['database'].get('path')))
     try:
         hist = history.History(cfg['database'].get('path'))
     except sqlite3.OperationalError as e:
