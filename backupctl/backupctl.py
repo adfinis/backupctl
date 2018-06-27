@@ -10,8 +10,9 @@ import sys
 import sqlalchemy
 from xdg import BaseDirectory
 
-from backupctl import history, zfs
+from backupctl import zfs
 from backupctl.dirvish import Dirvish
+from backupctl.history import History
 
 LOG = logging.getLogger(__name__)
 LOG.addHandler(logging.StreamHandler())
@@ -96,7 +97,7 @@ def main():
         ))
         sys.exit(1)
 
-    hist = history.History(engine)
+    hist = History(engine)
 
     if args.command == 'new':
         try:
