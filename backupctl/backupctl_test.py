@@ -8,7 +8,7 @@ import os
 import pytest
 import sqlalchemy
 
-from backupctl import backupctl, history
+from backupctl import backupctl, dirvish, history
 
 BACKUPCTL_DB = os.path.join(
     os.sep,
@@ -25,6 +25,15 @@ def ohistory():
     engine = sqlalchemy.create_engine('sqlite:///{0}'.format(BACKUPCTL_DB))
     hist_obj = history.History(engine)
     return hist_obj
+
+
+@pytest.fixture(autouse=True)
+def odirvish():
+    if not os.path.exists(os.path.dirname(BACKUPCTL_DB)):
+        os.makedirs(os.path.dirname(BACKUPCTL_DB))
+    engine = sqlalchemy.create_engine('sqlite:///{0}'.format(BACKUPCTL_DB))
+    dirvish_obj = dirvish.Dirvish(engine)
+    return dirvish_obj
 
 
 mock_data = {
@@ -115,6 +124,7 @@ def test_config():
 def test_customer(mock_zfs):
     backupctl.new(
         ohistory(),
+        odirvish(),
         pool='backup',
         root=os.path.join(os.sep, 'tmp', 'backupctl', 'backup'),
         customer='customer1',
@@ -187,6 +197,7 @@ def test_customer(mock_zfs):
 def test_vault(mock_zfs):
     backupctl.new(
         ohistory(),
+        odirvish(),
         pool='backup',
         root=os.path.join(os.sep, 'tmp', 'backupctl', 'backup'),
         customer='customer1',
@@ -195,6 +206,7 @@ def test_vault(mock_zfs):
     )
     backupctl.new(
         ohistory(),
+        odirvish(),
         pool='backup',
         root=os.path.join(os.sep, 'tmp', 'backupctl', 'backup'),
         customer='customer1',
@@ -204,6 +216,7 @@ def test_vault(mock_zfs):
     )
     backupctl.new(
         ohistory(),
+        odirvish(),
         pool='backup',
         root=os.path.join(os.sep, 'tmp', 'backupctl', 'backup'),
         customer='customer1',
@@ -338,6 +351,7 @@ def test_vault(mock_zfs):
 def test_new_no_customer():
     backupctl.new(
         ohistory(),
+        odirvish(),
         customer=None,
         vault=None,
         size=None,
@@ -349,6 +363,7 @@ def test_new_no_customer():
 def test_new_no_vault_or_size():
     backupctl.new(
         ohistory(),
+        odirvish(),
         customer='customer1',
         vault=None,
         size=None,

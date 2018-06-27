@@ -5,15 +5,25 @@ import logging
 import os
 
 import jinja2
+from sqlalchemy import Column, DateTime, Integer, String
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
 
 logger = logging.getLogger(__name__)
+Base = declarative_base()
 
 
 class Dirvish:
     """Create dirvish configuration and handle dirvish server triggers.
+
+    :ivar sqlalchemy.engine.base.Engine engine: SQLAlchemy engine.
+
+    :raises sqlalchemy.exc.ArgumentError: Raised when an invalid or conflicting
+                                          function argument is supplied.
+    :raises sqlalchemy.exc.OperationalError: Wraps a DB-API OperationalError.
     """
 
-    def __init__(self):
+    def __init__(self, engine):
         self._excludes_default = [
             '/dev/*',
             '/tmp/*',
@@ -29,6 +39,8 @@ class Dirvish:
             'lost+found/',
             '*~',
         ]
+        self._engine = engine
+        Base.metadata.create_all(engine)
 
     def create_config(self, root, customer, vault, client, excludes=None):
         """Create default dirvish configuration.
