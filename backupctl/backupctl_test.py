@@ -109,6 +109,7 @@ def test_config():
 def test_customer(mock_zfs):
     backupctl.new(
         hist(),
+        BACKUPCTL_DB,
         pool='backup',
         root=os.path.join(os.sep, 'tmp', 'backupctl', 'backup'),
         customer='customer1',
@@ -181,6 +182,7 @@ def test_customer(mock_zfs):
 def test_vault(mock_zfs):
     backupctl.new(
         hist(),
+        BACKUPCTL_DB,
         pool='backup',
         root=os.path.join(os.sep, 'tmp', 'backupctl', 'backup'),
         customer='customer1',
@@ -189,6 +191,7 @@ def test_vault(mock_zfs):
     )
     backupctl.new(
         hist(),
+        BACKUPCTL_DB,
         pool='backup',
         root=os.path.join(os.sep, 'tmp', 'backupctl', 'backup'),
         customer='customer1',
@@ -198,6 +201,7 @@ def test_vault(mock_zfs):
     )
     backupctl.new(
         hist(),
+        BACKUPCTL_DB,
         pool='backup',
         root=os.path.join(os.sep, 'tmp', 'backupctl', 'backup'),
         customer='customer1',

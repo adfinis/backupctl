@@ -10,7 +10,8 @@ import sys
 
 from xdg import BaseDirectory
 
-from backupctl import dirvish, history, zfs
+from backupctl import history, zfs
+from backupctl.dirvish import Dirvish
 
 LOG = logging.getLogger(__name__)
 LOG.addHandler(logging.StreamHandler())
@@ -87,6 +88,7 @@ def main():
         try:
             new(
                 hist,
+                cfg['database']['path'],
                 cfg['zfs']['pool'],
                 cfg['zfs']['root'],
                 args.customer,
@@ -136,6 +138,33 @@ def main():
     sys.exit(0)
 
 
+def backup_start():
+    """Add an entry to the database when a dirvish backup is started.
+
+    This function should be triggered by dirvish pre-server.
+    """
+    dirvish_server = os.environ.get('DIRVISH_SERVER', None)
+    dirvish_client = os.environ.get('DIRVISH_CLIENT', None)
+    dirvish_image = os.environ.get('DIRVISH_IMAGE', None)
+    cfg = config()
+    dirvish = Dirvish(cfg['database'].get('path'))
+    dirvish.backup_start()
+
+
+def backup_stop():
+    """Add an entry to the database when a dirvish backup is stopped.
+
+    This function should be triggered by dirvish post-server.
+    """
+    dirvish_server = os.environ.get('DIRVISH_SERVER', None)
+    dirvish_client = os.environ.get('DIRVISH_CLIENT', None)
+    dirvish_image = os.environ.get('DIRVISH_IMAGE', None)
+    dirvish_status = os.environ.get('DIRVISH_STATUS', None)
+    cfg = config()
+    dirvish = Dirvish(cfg['database'].get('path'))
+    dirvish.backup_stop()
+
+
 def config():
     """Read the configuration files. If no configuration exists, write the
     default configuration to the directory ~/.config.
@@ -161,10 +190,12 @@ def config():
     return cfg
 
 
-def new(hist, pool, root, customer, vault=None, size=None, client=None):
+def new(hist, dbpath, pool, root, customer, vault=None, size=None,
+        client=None):
     """Create a new customer or a new vault/server.
 
     :param history.History hist:    History database.
+    :param string dbpath:           Path to the backupctl database.
     :param string pool:             ZFS pool name.
     :param string root:             Backup root path.
     :param string customer:         Customer name.
@@ -193,6 +224,7 @@ def new(hist, pool, root, customer, vault=None, size=None, client=None):
         if vault is not None:
             if client is None:
                 client = vault
+            dirvish = Dirvish(dbpath)
             dirvish.create_config(
                 root,
                 customer,
