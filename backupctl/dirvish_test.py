@@ -35,6 +35,18 @@ def test_dirvish_config():
     )
 
 
+def test_create_machine():
+    if not os.path.exists(os.path.dirname(BACKUPCTL_DB)):
+        os.makedirs(os.path.dirname(BACKUPCTL_DB))
+    engine = sqlalchemy.create_engine('sqlite:///{0}'.format(BACKUPCTL_DB))
+    dirvish = Dirvish(engine)
+    dirvish.create_machine(
+        'backup.example.com',
+        'customer1/client.example.com',
+        'client.example.com',
+    )
+
+
 def test_dirvish_start():
     if not os.path.exists(os.path.dirname(BACKUPCTL_DB)):
         os.makedirs(os.path.dirname(BACKUPCTL_DB))

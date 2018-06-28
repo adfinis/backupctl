@@ -5,12 +5,25 @@ import logging
 import os
 
 import jinja2
-from sqlalchemy import Column, DateTime, Integer, String
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
 logger = logging.getLogger(__name__)
 Base = declarative_base()
+
+
+class MachineEntry(Base):
+    __tablename__ = 'machines'
+
+    id              = Column(Integer, primary_key=True)
+    dirvish_client  = Column(String)
+    dirvish_vault   = Column(String)
+    dirvish_server  = Column(String)
+    enabled         = Column(Boolean)
+
+    def __repr__(self):
+        return "<Entry(id='{0}')>".format(self.id)
 
 
 class Dirvish:
@@ -97,6 +110,35 @@ class Dirvish:
             )
         )
         return True
+
+    def create_machine(self, dirvish_server, dirvish_vault, dirvish_client):
+        """Add a machine in the machines table if it doesn't exist.
+
+        :param string dirvish_server:   Backup server (dirvish server).
+        :param string dirvish_vault:    Backup vault (dirvish vault).
+        :param string dirvish_client:   Backup client (machine to backup).
+
+        :returns:   A server object.
+        :rtype:     `dirvish.ServerEntry`
+        """
+        db_session = sessionmaker(bind=self._engine)
+        session = db_session()
+
+        machine = session.query(MachineEntry).filter_by(
+            dirvish_client=dirvish_client,
+            dirvish_vault=dirvish_vault,
+            dirvish_server=dirvish_server,
+        ).first()
+        if not machine:
+            machine = MachineEntry(
+                dirvish_client=dirvish_client,
+                dirvish_vault=dirvish_vault,
+                dirvish_server=dirvish_server,
+                enabled=True,
+            )
+            session.add(machine)
+            session.commit()
+        return machine
 
     def backup_start(self):
         """Add an entry to the database when a dirvish backup is started.
