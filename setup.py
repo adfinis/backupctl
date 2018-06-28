@@ -27,6 +27,7 @@ setup(
     install_requires=(
         'pyxdg',
         'jinja2',
+        'SQLAlchemy',
     ),
     keywords='dirvish, zfs',
     url='https://www.adfinis-sygroup.ch/',

@@ -5,9 +5,9 @@ import argparse
 import configparser
 import logging
 import os
-import sqlite3
 import sys
 
+import sqlalchemy
 from xdg import BaseDirectory
 
 from backupctl import dirvish, history, zfs
@@ -73,15 +73,29 @@ def main():
     args = parser.parse_args()
 
     cfg = config()
+
     if not os.path.exists(os.path.dirname(cfg['database'].get('path'))):
         os.makedirs(os.path.dirname(cfg['database'].get('path')))
+
     try:
-        hist = history.History(cfg['database'].get('path'))
-    except sqlite3.OperationalError as e:
+        engine = sqlalchemy.create_engine(cfg['database'].get('fullpath'))
+        LOG.debug(
+            "Opened database {0} successfully".format(
+                cfg['database'].get('fullpath'),
+            )
+        )
+    except sqlalchemy.exc.ArgumentError as e:
         LOG.error("Couldn't open database {0}. Exit now.".format(
-            cfg['database'].get('path'),
+            cfg['database'].get('fullpath'),
         ))
         sys.exit(1)
+    except sqlalchemy.exc.OperationalError as e:
+        LOG.error("Couldn't open database {0}. Exit now.".format(
+            cfg['database'].get('fullpath'),
+        ))
+        sys.exit(1)
+
+    hist = history.History(engine)
 
     if args.command == 'new':
         try:
@@ -150,6 +164,8 @@ def config():
 
     if not cfg.has_section('database'):
         cfg.add_section('database')
+    if not cfg.has_option('database', 'type'):
+        cfg['database']['type'] = 'sqlite'
     if not cfg.has_option('database', 'path'):
         cfg['database']['path'] = os.path.join(
             os.sep,
@@ -157,6 +173,11 @@ def config():
             'lib',
             'backupctl',
             'backupctl.db',
+        )
+    if not cfg.has_option('database', 'fullpath'):
+        cfg['database']['fullpath'] = '{0}:///{1}'.format(
+            cfg['database'].get('type'),
+            cfg['database'].get('path'),
         )
     return cfg
 
