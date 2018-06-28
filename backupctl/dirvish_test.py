@@ -42,7 +42,6 @@ def test_create_machine():
     dirvish = Dirvish(engine)
     dirvish.create_machine(
         'backup.example.com',
-        'customer1/client.example.com',
         'client.example.com',
     )
 
@@ -52,10 +51,12 @@ def test_dirvish_start():
         os.makedirs(os.path.dirname(BACKUPCTL_DB))
     engine = sqlalchemy.create_engine('sqlite:///{0}'.format(BACKUPCTL_DB))
     dirvish = Dirvish(engine)
-    os.environ['DIRVISH_SERVER'] = 'backup.example.com'
+    os.environ['DIRVISH_SRC'] = ''
+    os.environ['DIRVISH_IMAGE'] = 'client.example.com:default:1970-01-01_00:00'
+    os.environ['DIRVISH_DEST'] = '/backup/client.example.com/latest/tree'
+    os.environ['DIRVISH_EXCLUDE'] = '/backup/client.example.com/latest/exclude'
     os.environ['DIRVISH_CLIENT'] = 'client.example.com'
-    os.environ['DIRVISH_VAULT'] = 'customer1/client.example.com'
-    os.environ['DIRVISH_IMAGE'] = 'client.example.com:default:2018-05-09_14:01'
+    os.environ['DIRVISH_SERVER'] = 'backup.example.com'
     dirvish.backup_start()
 
 
@@ -64,9 +65,11 @@ def test_dirvish_stop():
         os.makedirs(os.path.dirname(BACKUPCTL_DB))
     engine = sqlalchemy.create_engine('sqlite:///{0}'.format(BACKUPCTL_DB))
     dirvish = Dirvish(engine)
-    os.environ['DIRVISH_SERVER'] = 'backup.example.com'
-    os.environ['DIRVISH_CLIENT'] = 'client.example.com'
-    os.environ['DIRVISH_VAULT'] = 'customer1/client.example.com'
-    os.environ['DIRVISH_IMAGE'] = 'client.example.com:default:2018-05-09_14:01'
     os.environ['DIRVISH_STATUS'] = 'success'
+    os.environ['DIRVISH_SRC'] = ''
+    os.environ['DIRVISH_IMAGE'] = 'client.example.com:default:1970-01-01_00:00'
+    os.environ['DIRVISH_DEST'] = '/backup/client.example.com/latest/tree'
+    os.environ['DIRVISH_EXCLUDE'] = '/backup/client.example.com/latest/exclude'
+    os.environ['DIRVISH_CLIENT'] = 'client.example.com'
+    os.environ['DIRVISH_SERVER'] = 'backup.example.com'
     dirvish.backup_stop()

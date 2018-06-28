@@ -19,7 +19,6 @@ class MachineEntry(Base):
 
     id              = Column(Integer, primary_key=True)
     dirvish_client  = Column(String)
-    dirvish_vault   = Column(String)
     dirvish_server  = Column(String)
     enabled         = Column(Boolean)
 
@@ -125,11 +124,10 @@ class Dirvish:
         )
         return True
 
-    def create_machine(self, dirvish_server, dirvish_vault, dirvish_client):
+    def create_machine(self, dirvish_server, dirvish_client):
         """Add a machine in the machines table if it doesn't exist.
 
         :param string dirvish_server:   Backup server (dirvish server).
-        :param string dirvish_vault:    Backup vault (dirvish vault).
         :param string dirvish_client:   Backup client (machine to backup).
 
         :returns:   A server object.
@@ -140,13 +138,11 @@ class Dirvish:
 
         machine = session.query(MachineEntry).filter_by(
             dirvish_client=dirvish_client,
-            dirvish_vault=dirvish_vault,
             dirvish_server=dirvish_server,
         ).first()
         if not machine:
             machine = MachineEntry(
                 dirvish_client=dirvish_client,
-                dirvish_vault=dirvish_vault,
                 dirvish_server=dirvish_server,
                 enabled=True,
             )
@@ -159,14 +155,12 @@ class Dirvish:
 
         This function should be triggered by dirvish pre-server.
         """
-        dirvish_vault  = os.environ.get('DIRVISH_VAULT', None)
         dirvish_server = os.environ.get('DIRVISH_SERVER', None)
         dirvish_client = os.environ.get('DIRVISH_CLIENT', None)
         # dirvish_image  = os.environ.get('DIRVISH_IMAGE', None)
 
         machine = self.create_machine(
             dirvish_server,
-            dirvish_vault,
             dirvish_client,
         )
 
@@ -186,7 +180,6 @@ class Dirvish:
 
         This function should be triggered by dirvish post-server.
         """
-        dirvish_vault  = os.environ.get('DIRVISH_VAULT', None)
         dirvish_server = os.environ.get('DIRVISH_SERVER', None)
         dirvish_client = os.environ.get('DIRVISH_CLIENT', None)
         # dirvish_image  = os.environ.get('DIRVISH_IMAGE', None)
@@ -194,7 +187,6 @@ class Dirvish:
 
         machine = self.create_machine(
             dirvish_server,
-            dirvish_vault,
             dirvish_client,
         )
 
