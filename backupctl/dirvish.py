@@ -3,6 +3,7 @@
 
 import logging
 import os
+from datetime import datetime
 
 import jinja2
 from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String
@@ -21,6 +22,19 @@ class MachineEntry(Base):
     dirvish_vault   = Column(String)
     dirvish_server  = Column(String)
     enabled         = Column(Boolean)
+
+    def __repr__(self):
+        return "<Entry(id='{0}')>".format(self.id)
+
+
+class DirvishEntry(Base):
+    __tablename__ = 'dirvish'
+
+    id       = Column(Integer, primary_key=True)
+    datetime = Column(DateTime)
+    machine  = Column(Integer, ForeignKey(MachineEntry.id))
+    trigger  = Column(String)
+    status   = Column(Integer)
 
     def __repr__(self):
         return "<Entry(id='{0}')>".format(self.id)
@@ -145,16 +159,53 @@ class Dirvish:
 
         This function should be triggered by dirvish pre-server.
         """
+        dirvish_vault  = os.environ.get('DIRVISH_VAULT', None)
         dirvish_server = os.environ.get('DIRVISH_SERVER', None)
         dirvish_client = os.environ.get('DIRVISH_CLIENT', None)
-        dirvish_image = os.environ.get('DIRVISH_IMAGE', None)
+        # dirvish_image  = os.environ.get('DIRVISH_IMAGE', None)
+
+        machine = self.create_machine(
+            dirvish_server,
+            dirvish_vault,
+            dirvish_client,
+        )
+
+        new_entry = DirvishEntry(
+            datetime=datetime.now(),
+            machine=machine.id,
+            trigger='start',
+        )
+
+        db_session = sessionmaker(bind=self._engine)
+        session = db_session()
+        session.add(new_entry)
+        session.commit()
 
     def backup_stop(self):
         """Add an entry to the database when a dirvish backup is stopped.
 
         This function should be triggered by dirvish post-server.
         """
+        dirvish_vault  = os.environ.get('DIRVISH_VAULT', None)
         dirvish_server = os.environ.get('DIRVISH_SERVER', None)
         dirvish_client = os.environ.get('DIRVISH_CLIENT', None)
-        dirvish_image = os.environ.get('DIRVISH_IMAGE', None)
+        # dirvish_image  = os.environ.get('DIRVISH_IMAGE', None)
         dirvish_status = os.environ.get('DIRVISH_STATUS', None)
+
+        machine = self.create_machine(
+            dirvish_server,
+            dirvish_vault,
+            dirvish_client,
+        )
+
+        new_entry = DirvishEntry(
+            datetime=datetime.now(),
+            machine=machine.id,
+            trigger='end',
+            status=dirvish_status,
+        )
+
+        db_session = sessionmaker(bind=self._engine)
+        session = db_session()
+        session.add(new_entry)
+        session.commit()

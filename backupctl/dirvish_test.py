@@ -54,6 +54,7 @@ def test_dirvish_start():
     dirvish = Dirvish(engine)
     os.environ['DIRVISH_SERVER'] = 'backup.example.com'
     os.environ['DIRVISH_CLIENT'] = 'client.example.com'
+    os.environ['DIRVISH_VAULT'] = 'customer1/client.example.com'
     os.environ['DIRVISH_IMAGE'] = 'client.example.com:default:2018-05-09_14:01'
     dirvish.backup_start()
 
@@ -65,6 +66,7 @@ def test_dirvish_stop():
     dirvish = Dirvish(engine)
     os.environ['DIRVISH_SERVER'] = 'backup.example.com'
     os.environ['DIRVISH_CLIENT'] = 'client.example.com'
+    os.environ['DIRVISH_VAULT'] = 'customer1/client.example.com'
     os.environ['DIRVISH_IMAGE'] = 'client.example.com:default:2018-05-09_14:01'
     os.environ['DIRVISH_STATUS'] = 'success'
     dirvish.backup_stop()
