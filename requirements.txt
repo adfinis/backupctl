@@ -6,3 +6,5 @@ pytest>=3.5.0
 pytest-cov>=2.5.1
 pytest-mock>=1.9.0
 Pygments>=2.2.0
+pre-commit>=1.10.5
+yamllint>=1.11.1
