@@ -169,12 +169,10 @@ def backup_start():
                 cfg['database'].get('fullpath'),
             )
         )
-    except sqlalchemy.exc.ArgumentError as e:
-        LOG.error("Couldn't open database {0}. Exit now.".format(
-            cfg['database'].get('fullpath'),
-        ))
-        sys.exit(1)
-    except sqlalchemy.exc.OperationalError as e:
+    except (
+            sqlalchemy.exc.ArgumentError,
+            sqlalchemy.exc.OperationalError,
+    ) as e:
         LOG.error("Couldn't open database {0}. Exit now.".format(
             cfg['database'].get('fullpath'),
         ))
