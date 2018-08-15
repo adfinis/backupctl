@@ -8,7 +8,7 @@ import os
 import pytest
 import sqlalchemy
 
-from backupctl import backupctl, history
+from backupctl import backupctl, dirvish, history
 
 BACKUPCTL_DB = os.path.join(
     os.sep,
@@ -19,12 +19,21 @@ BACKUPCTL_DB = os.path.join(
 
 
 @pytest.fixture(autouse=True)
-def hist():
+def ohistory():
     if not os.path.exists(os.path.dirname(BACKUPCTL_DB)):
         os.makedirs(os.path.dirname(BACKUPCTL_DB))
     engine = sqlalchemy.create_engine('sqlite:///{0}'.format(BACKUPCTL_DB))
     hist_obj = history.History(engine)
     return hist_obj
+
+
+@pytest.fixture(autouse=True)
+def odirvish():
+    if not os.path.exists(os.path.dirname(BACKUPCTL_DB)):
+        os.makedirs(os.path.dirname(BACKUPCTL_DB))
+    engine = sqlalchemy.create_engine('sqlite:///{0}'.format(BACKUPCTL_DB))
+    dirvish_obj = dirvish.Dirvish(engine)
+    return dirvish_obj
 
 
 mock_data = {
@@ -114,7 +123,8 @@ def test_config():
 
 def test_customer(mock_zfs):
     backupctl.new(
-        hist(),
+        ohistory(),
+        odirvish(),
         pool='backup',
         root=os.path.join(os.sep, 'tmp', 'backupctl', 'backup'),
         customer='customer1',
@@ -122,13 +132,13 @@ def test_customer(mock_zfs):
         client=None,
     )
     backupctl.resize(
-        hist(),
+        ohistory(),
         pool='backup',
         customer='customer1',
         size='2G',
     )
     backupctl.remove(
-        hist(),
+        ohistory(),
         pool='backup',
         customer='customer1',
     )
@@ -186,7 +196,8 @@ def test_customer(mock_zfs):
 
 def test_vault(mock_zfs):
     backupctl.new(
-        hist(),
+        ohistory(),
+        odirvish(),
         pool='backup',
         root=os.path.join(os.sep, 'tmp', 'backupctl', 'backup'),
         customer='customer1',
@@ -194,7 +205,8 @@ def test_vault(mock_zfs):
         client=None,
     )
     backupctl.new(
-        hist(),
+        ohistory(),
+        odirvish(),
         pool='backup',
         root=os.path.join(os.sep, 'tmp', 'backupctl', 'backup'),
         customer='customer1',
@@ -203,7 +215,8 @@ def test_vault(mock_zfs):
         client=None,
     )
     backupctl.new(
-        hist(),
+        ohistory(),
+        odirvish(),
         pool='backup',
         root=os.path.join(os.sep, 'tmp', 'backupctl', 'backup'),
         customer='customer1',
@@ -212,20 +225,20 @@ def test_vault(mock_zfs):
         client='192.0.2.1',
     )
     backupctl.resize(
-        hist(),
+        ohistory(),
         pool='backup',
         customer='customer1',
         vault='mail.example.com',
         size='200M',
     )
     backupctl.remove(
-        hist(),
+        ohistory(),
         pool='backup',
         customer='customer1',
         vault='mail.example.com',
     )
     backupctl.remove(
-        hist(),
+        ohistory(),
         pool='backup',
         customer='customer1',
     )
@@ -337,7 +350,8 @@ def test_vault(mock_zfs):
 @pytest.mark.xfail
 def test_new_no_customer():
     backupctl.new(
-        hist(),
+        ohistory(),
+        odirvish(),
         customer=None,
         vault=None,
         size=None,
@@ -348,7 +362,8 @@ def test_new_no_customer():
 @pytest.mark.xfail
 def test_new_no_vault_or_size():
     backupctl.new(
-        hist(),
+        ohistory(),
+        odirvish(),
         customer='customer1',
         vault=None,
         size=None,
@@ -359,7 +374,7 @@ def test_new_no_vault_or_size():
 @pytest.mark.xfail
 def test_resize_no_customer():
     backupctl.resize(
-        hist(),
+        ohistory(),
         customer=None,
         vault=None,
         size=None,
@@ -369,7 +384,7 @@ def test_resize_no_customer():
 @pytest.mark.xfail
 def test_resize_no_size():
     backupctl.resize(
-        hist(),
+        ohistory(),
         customer='customer1',
         vault=None,
         size=None,
@@ -379,11 +394,11 @@ def test_resize_no_size():
 @pytest.mark.xfail
 def test_remove_no_customer():
     backupctl.remove(
-        hist(),
+        ohistory(),
         customer=None,
         vault=None,
     )
 
 
 def test_history_show():
-    backupctl.history_show(hist())
+    backupctl.history_show(ohistory())
