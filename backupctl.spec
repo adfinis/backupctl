@@ -1,7 +1,7 @@
 %define __python /usr/bin/python3
 
 Name:           backupctl
-Version:        1.1.3
+Version:        2.0.0
 Release:        1%{?dist}
 Summary:        Tool to manage zfs volumes and create new dirvish vault configurations.
 License:        GPLv3
@@ -9,7 +9,7 @@ License:        GPLv3
 Source0:        https://github.com/adfinis-sygroup/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 
-BuildRequires:  python34 python34-setuptools python34-docutils
+BuildRequires:  python34, python34-setuptools, python34-docutils, tar, gzip
 Requires:       python34-jinja2, python34-setuptools, python34-pyxdg, dirvish, zfs
 
 %description
@@ -36,6 +36,8 @@ install -Dm0644 %{name}.ini.5.gz %{buildroot}%{_mandir}/man5/%{name}.ini.5.gz
 %doc README.rst
 %{python_sitelib}/*
 %{_prefix}/bin/backupctl
+%{_prefix}/bin/backupctl-start
+%{_prefix}/bin/backupctl-stop
 %config(noreplace)%{_sysconfdir}/%{name}.ini
 %{_mandir}/man8/%{name}.8.gz
 %{_mandir}/man5/%{name}.ini.5.gz
