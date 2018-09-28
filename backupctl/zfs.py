@@ -65,13 +65,16 @@ def resize_filesystem(fs, size):
     :returns: True if the quota was set correctly, else False.
     :rtype: bool
     """
-    usage = filesystem_usage(fs)
-    if usage > parse_size(size):
-        logger.warn("new size ({0}) is smaller than used size ({1})".format(
-            size,
-            usage,
-        ))
-        return False
+    if size.lower() != 'none':
+        usage = filesystem_usage(fs)
+        if usage > parse_size(size):
+            logger.warn(
+                "new size ({0}) is smaller than used size ({1})".format(
+                    size,
+                    usage,
+                ),
+            )
+            return False
     returncode, stdout, stderr = execute_cmd([
         'zfs',
         'set',

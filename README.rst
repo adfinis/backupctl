@@ -37,7 +37,7 @@ Create a new customer zfs volume or a new dirvish vault inside a customer.
 resize -n customer [-v server/vault] -s size
 ---------------------------------------------
 Resize an existing customer zfs volume or dirvish vault inside a customer.
-Shrinking is supported too.
+Shrinking is supported too. To unset a quota, set the size to "none".
 
 remove -n customer [-v server/vault]
 -------------------------------------

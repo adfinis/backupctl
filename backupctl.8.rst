@@ -57,6 +57,7 @@ resize -n customer [-v server/vault] -s size
 Resize an existing customer zfs volume or dirvish vault inside a customer.
 Shrinking is supported too, but if there is more data in the vault than the
 size you're trying to shrink to an error will occur.
+To unset a quota, set the parameter size to "none".
 
 remove -n customer [-v server/vault]
 -------------------------------------
