@@ -120,6 +120,8 @@ class Dirvish:
                 root,
                 customer,
                 vault,
+            'Please add the backup Job to /etc/crontab\n'
+            'XX YY   *  *  *         root    adfinis-dirvish {1}/{2}'
             )
         )
         return True
