@@ -116,7 +116,9 @@ class Dirvish:
             'You should now edit the dirvish configuration and run an '
             'initial backup.\n'
             '$EDITOR {0}/{1}/{2}/dirvish/default.conf\n'
-            'dirvish --vault {1}/{2} --init\n'.format(
+            'dirvish --vault {1}/{2} --init\n\n'
+            'Please add the backup Job to /etc/crontab:\n'
+            'XX YY   *  *  *    root    dirvish --vault {1}/{2}\n'.format(
                 root,
                 customer,
                 vault,
