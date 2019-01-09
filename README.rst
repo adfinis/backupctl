@@ -121,7 +121,6 @@ The following exit values are returned:
 1
   An error occurred.
 
-
 2
   No command was given.
 
