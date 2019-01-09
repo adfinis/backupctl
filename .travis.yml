@@ -1,9 +1,16 @@
 language: python
 
-python:
-  - 3.4
-  - 3.5
-  - 3.6
+matrix:
+  include:
+    - name: "Python 3.7 on Linux Ubuntu Xenial"
+      python: 3.7
+      dist: xenial
+    - name: "Python 3.6 on Linux"
+      python: 3.6
+    - name: "Python 3.5 on Linux"
+      python: 3.5
+    - name: "Python 3.4 on Linux"
+      python: 3.4
 
 addons:
   apt:
