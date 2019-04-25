@@ -64,6 +64,19 @@ class Dirvish:
             '/var/cache/yum/*',
             'lost+found/',
             '*~',
+            '/var/lib/docker/aufs/*',
+            '/var/lib/docker/builder/*',
+            '/var/lib/docker/containers/*',
+            '/var/lib/docker/devicemapper/*',
+            '/var/lib/docker/image/*',
+            '/var/lib/docker/network/*',
+            '/var/lib/docker/overlay/*',
+            '/var/lib/docker/overlay2/*',
+            '/var/lib/docker/plugins/*',
+            '/var/lib/docker/repositories-aufs/*',
+            '/var/lib/docker/swarm/*',
+            '/var/lib/docker/tmp/*',
+            '/var/lib/docker/trust/*'
         ]
         self._engine = engine
         Base.metadata.create_all(engine)
