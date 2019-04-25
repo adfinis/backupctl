@@ -38,7 +38,8 @@ def main():
         """,
     )
     parser.add_argument(
-        "-v", "--vault",
+        "-v",
+        "--vault",
         required=False,
         default=None,
         help="""\
@@ -56,7 +57,8 @@ def main():
         """,
     )
     parser.add_argument(
-        "-n", "--customer",
+        "-n",
+        "--customer",
         required=False,
         default=None,
         help="""\
@@ -64,7 +66,8 @@ def main():
         """,
     )
     parser.add_argument(
-        "-s", "--size",
+        "-s",
+        "--size",
         required=False,
         default=None,
         help="""\
@@ -76,37 +79,39 @@ def main():
 
     cfg = config()
 
-    if not os.path.exists(os.path.dirname(cfg['database'].get('path'))):
-        os.makedirs(os.path.dirname(cfg['database'].get('path')))
+    if not os.path.exists(os.path.dirname(cfg["database"].get("path"))):
+        os.makedirs(os.path.dirname(cfg["database"].get("path")))
 
     try:
-        engine = sqlalchemy.create_engine(cfg['database'].get('fullpath'))
+        engine = sqlalchemy.create_engine(cfg["database"].get("fullpath"))
         LOG.debug(
-            "Opened database {0} successfully".format(
-                cfg['database'].get('fullpath'),
-            )
+            "Opened database {0} successfully".format(cfg["database"].get("fullpath"))
         )
     except sqlalchemy.exc.ArgumentError as e:
-        LOG.error("Couldn't open database {0}. Exit now.".format(
-            cfg['database'].get('fullpath'),
-        ))
+        LOG.error(
+            "Couldn't open database {0}. Exit now.".format(
+                cfg["database"].get("fullpath")
+            )
+        )
         sys.exit(1)
     except sqlalchemy.exc.OperationalError as e:
-        LOG.error("Couldn't open database {0}. Exit now.".format(
-            cfg['database'].get('fullpath'),
-        ))
+        LOG.error(
+            "Couldn't open database {0}. Exit now.".format(
+                cfg["database"].get("fullpath")
+            )
+        )
         sys.exit(1)
 
     hist = History(engine)
     dirvish = Dirvish(engine)
 
-    if args.command == 'new':
+    if args.command == "new":
         try:
             new(
                 hist,
                 dirvish,
-                cfg['zfs']['pool'],
-                cfg['zfs']['root'],
+                cfg["zfs"]["pool"],
+                cfg["zfs"]["root"],
                 args.customer,
                 args.vault,
                 args.size,
@@ -118,36 +123,23 @@ def main():
                 "configuration file. Exit now."
             )
             sys.exit(1)
-    elif args.command == 'resize':
+    elif args.command == "resize":
         try:
-            resize(
-                hist,
-                cfg['zfs']['pool'],
-                args.customer,
-                args.vault,
-                args.size,
-            )
+            resize(hist, cfg["zfs"]["pool"], args.customer, args.vault, args.size)
         except KeyError as e:
             LOG.error(
-                "ZFS Pool must be specified in the configuration file. "
-                "Exit now."
+                "ZFS Pool must be specified in the configuration file. Exit now."
             )
             sys.exit(1)
-    elif args.command == 'remove':
+    elif args.command == "remove":
         try:
-            remove(
-                hist,
-                cfg['zfs']['pool'],
-                args.customer,
-                args.vault,
-            )
+            remove(hist, cfg["zfs"]["pool"], args.customer, args.vault)
         except KeyError as e:
             LOG.error(
-                "ZFS Pool must be specified in the configuration file. "
-                "Exit now."
+                "ZFS Pool must be specified in the configuration file. Exit now."
             )
             sys.exit(1)
-    elif args.command == 'log':
+    elif args.command == "log":
         history_show(hist)
     else:
         sys.exit(1)
@@ -160,22 +152,19 @@ def backup_start():
     This function should be triggered by dirvish pre-server.
     """
     cfg = config()
-    if not os.path.exists(os.path.dirname(cfg['database'].get('path'))):
-        os.makedirs(os.path.dirname(cfg['database'].get('path')))
+    if not os.path.exists(os.path.dirname(cfg["database"].get("path"))):
+        os.makedirs(os.path.dirname(cfg["database"].get("path")))
     try:
-        engine = sqlalchemy.create_engine(cfg['database'].get('fullpath'))
+        engine = sqlalchemy.create_engine(cfg["database"].get("fullpath"))
         LOG.debug(
-            "Opened database {0} successfully".format(
-                cfg['database'].get('fullpath'),
+            "Opened database {0} successfully".format(cfg["database"].get("fullpath"))
+        )
+    except (sqlalchemy.exc.ArgumentError, sqlalchemy.exc.OperationalError) as e:
+        LOG.error(
+            "Couldn't open database {0}. Exit now.".format(
+                cfg["database"].get("fullpath")
             )
         )
-    except (
-            sqlalchemy.exc.ArgumentError,
-            sqlalchemy.exc.OperationalError,
-    ) as e:
-        LOG.error("Couldn't open database {0}. Exit now.".format(
-            cfg['database'].get('fullpath'),
-        ))
         sys.exit(1)
     dirvish = Dirvish(engine)
     dirvish.backup_start()
@@ -187,24 +176,26 @@ def backup_stop():
     This function should be triggered by dirvish post-server.
     """
     cfg = config()
-    if not os.path.exists(os.path.dirname(cfg['database'].get('path'))):
-        os.makedirs(os.path.dirname(cfg['database'].get('path')))
+    if not os.path.exists(os.path.dirname(cfg["database"].get("path"))):
+        os.makedirs(os.path.dirname(cfg["database"].get("path")))
     try:
-        engine = sqlalchemy.create_engine(cfg['database'].get('fullpath'))
+        engine = sqlalchemy.create_engine(cfg["database"].get("fullpath"))
         LOG.debug(
-            "Opened database {0} successfully".format(
-                cfg['database'].get('fullpath'),
-            )
+            "Opened database {0} successfully".format(cfg["database"].get("fullpath"))
         )
     except sqlalchemy.exc.ArgumentError as e:
-        LOG.error("Couldn't open database {0}. Exit now.".format(
-            cfg['database'].get('fullpath'),
-        ))
+        LOG.error(
+            "Couldn't open database {0}. Exit now.".format(
+                cfg["database"].get("fullpath")
+            )
+        )
         sys.exit(1)
     except sqlalchemy.exc.OperationalError as e:
-        LOG.error("Couldn't open database {0}. Exit now.".format(
-            cfg['database'].get('fullpath'),
-        ))
+        LOG.error(
+            "Couldn't open database {0}. Exit now.".format(
+                cfg["database"].get("fullpath")
+            )
+        )
         sys.exit(1)
     dirvish = Dirvish(engine)
     dirvish.backup_stop()
@@ -218,32 +209,26 @@ def config():
     :rtype: `configparser.ConfigParser`
     """
     cfg = configparser.ConfigParser()
-    cfg.read(os.path.join(os.sep, 'etc', 'backupctl.ini'))
-    cfg.read(os.path.join(BaseDirectory.xdg_config_home, 'backupctl.ini'))
-    cfg.read('backupctl.ini')
+    cfg.read(os.path.join(os.sep, "etc", "backupctl.ini"))
+    cfg.read(os.path.join(BaseDirectory.xdg_config_home, "backupctl.ini"))
+    cfg.read("backupctl.ini")
 
-    if not cfg.has_section('database'):
-        cfg.add_section('database')
-    if not cfg.has_option('database', 'type'):
-        cfg['database']['type'] = 'sqlite'
-    if not cfg.has_option('database', 'path'):
-        cfg['database']['path'] = os.path.join(
-            os.sep,
-            'var',
-            'lib',
-            'backupctl',
-            'backupctl.db',
+    if not cfg.has_section("database"):
+        cfg.add_section("database")
+    if not cfg.has_option("database", "type"):
+        cfg["database"]["type"] = "sqlite"
+    if not cfg.has_option("database", "path"):
+        cfg["database"]["path"] = os.path.join(
+            os.sep, "var", "lib", "backupctl", "backupctl.db"
         )
-    if not cfg.has_option('database', 'fullpath'):
-        cfg['database']['fullpath'] = '{0}:///{1}'.format(
-            cfg['database'].get('type'),
-            cfg['database'].get('path'),
+    if not cfg.has_option("database", "fullpath"):
+        cfg["database"]["fullpath"] = "{0}:///{1}".format(
+            cfg["database"].get("type"), cfg["database"].get("path")
         )
     return cfg
 
 
-def new(hist, dirvish, pool, root, customer, vault=None, size=None,
-        client=None):
+def new(hist, dirvish, pool, root, customer, vault=None, size=None, client=None):
     """Create a new customer or a new vault/server.
 
     :param history.History hist:    History database.
@@ -255,10 +240,10 @@ def new(hist, dirvish, pool, root, customer, vault=None, size=None,
     :param string size:             Quota for this customer or vault.
     """
     if not customer:
-        LOG.error('Customer is needed')
+        LOG.error("Customer is needed")
         sys.exit(1)
     if not vault and not size:
-        LOG.error('If no vault is given, a size is required')
+        LOG.error("If no vault is given, a size is required")
         sys.exit(1)
     if vault is not None:
         fs = os.path.join(pool, customer, vault)
@@ -266,23 +251,14 @@ def new(hist, dirvish, pool, root, customer, vault=None, size=None,
     else:
         fs = os.path.join(pool, customer)
         path = os.path.join(root, customer)
-    fs_status = zfs.new_filesystem(
-        fs,
-        path,
-        size,
-    )
+    fs_status = zfs.new_filesystem(fs, path, size)
     if fs_status:
-        hist.add(customer, 'create', vault, size)
+        hist.add(customer, "create", vault, size)
         if vault is not None:
             if client is None:
                 client = vault
-            dirvish.create_config(
-                root,
-                customer,
-                vault,
-                client,
-            )
-            hist.add(customer, 'config', vault)
+            dirvish.create_config(root, customer, vault, client)
+            hist.add(customer, "config", vault)
 
 
 def resize(hist, pool, customer, vault=None, size=None):
@@ -295,20 +271,17 @@ def resize(hist, pool, customer, vault=None, size=None):
     :param string size:             Quota for this customer or vault.
     """
     if not customer:
-        LOG.error('Customer is needed')
+        LOG.error("Customer is needed")
         sys.exit(1)
     if not size:
-        LOG.error('A size is required')
+        LOG.error("A size is required")
         sys.exit(1)
     if vault:
         fs = os.path.join(pool, customer, vault)
     else:
         fs = os.path.join(pool, customer)
-    zfs.resize_filesystem(
-        fs,
-        size,
-    )
-    hist.add(customer, 'resize', vault, size)
+    zfs.resize_filesystem(fs, size)
+    hist.add(customer, "resize", vault, size)
 
 
 def remove(hist, pool, customer, vault=None):
@@ -320,16 +293,14 @@ def remove(hist, pool, customer, vault=None):
     :param string vault:            Vault name or server hostname.
     """
     if not customer:
-        LOG.error('Customer is needed')
+        LOG.error("Customer is needed")
         sys.exit(1)
     if vault:
         fs = os.path.join(pool, customer, vault)
     else:
         fs = os.path.join(pool, customer)
-    zfs.remove_filesystem(
-        fs,
-    )
-    hist.add(customer, 'remove', vault)
+    zfs.remove_filesystem(fs)
+    hist.add(customer, "remove", vault)
 
 
 def history_show(history):
@@ -341,5 +312,5 @@ def history_show(history):
         print(row)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

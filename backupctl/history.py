@@ -13,14 +13,14 @@ Base = declarative_base()
 
 
 class HistoryEntry(Base):
-    __tablename__ = 'history'
+    __tablename__ = "history"
 
-    id       = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True)
     datetime = Column(DateTime)
-    command  = Column(String)
+    command = Column(String)
     customer = Column(String)
-    vault    = Column(String)
-    size     = Column(String)
+    vault = Column(String)
+    size = Column(String)
 
     def __repr__(self):
         return "<Entry(id='{0}')>".format(self.id)
@@ -92,30 +92,22 @@ class History:
         session = db_session()
 
         history_list = []
-        entries = session.query(HistoryEntry).order_by(
-            HistoryEntry.datetime
-        )[-count:]
+        entries = session.query(HistoryEntry).order_by(HistoryEntry.datetime)[-count:]
 
         for entry in entries:
             dt = str(entry.datetime)
-            command = '{0}'.format(entry.command)
+            command = "{0}".format(entry.command)
             customer = 'customer "{0}" '.format(entry.customer)
             if entry.vault != "None":
                 vault = 'vault "{0}" '.format(entry.vault)
             else:
-                vault = ''
+                vault = ""
             if entry.size != "None":
-                size = 'with size {0} '.format(entry.size)
+                size = "with size {0} ".format(entry.size)
             else:
-                size = ''
+                size = ""
 
             history_list.append(
-                '{0} - {1} {2}{3}{4}'.format(
-                    dt,
-                    command,
-                    customer,
-                    vault,
-                    size,
-                )
+                "{0} - {1} {2}{3}{4}".format(dt, command, customer, vault, size)
             )
         return history_list

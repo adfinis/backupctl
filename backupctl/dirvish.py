@@ -15,25 +15,25 @@ Base = declarative_base()
 
 
 class MachineEntry(Base):
-    __tablename__ = 'machines'
+    __tablename__ = "machines"
 
-    id              = Column(Integer, primary_key=True)
-    dirvish_client  = Column(String)
-    dirvish_server  = Column(String)
-    enabled         = Column(Boolean)
+    id = Column(Integer, primary_key=True)
+    dirvish_client = Column(String)
+    dirvish_server = Column(String)
+    enabled = Column(Boolean)
 
     def __repr__(self):
         return "<Entry(id='{0}')>".format(self.id)
 
 
 class DirvishEntry(Base):
-    __tablename__ = 'dirvish'
+    __tablename__ = "dirvish"
 
-    id       = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True)
     datetime = Column(DateTime)
-    machine  = Column(Integer, ForeignKey(MachineEntry.id))
-    trigger  = Column(String)
-    status   = Column(Integer)
+    machine = Column(Integer, ForeignKey(MachineEntry.id))
+    trigger = Column(String)
+    status = Column(Integer)
 
     def __repr__(self):
         return "<Entry(id='{0}')>".format(self.id)
@@ -51,32 +51,32 @@ class Dirvish:
 
     def __init__(self, engine):
         self._excludes_default = [
-            '/dev/*',
-            '/tmp/*',
-            '/var/tmp/*',
-            '/run/*',
-            '/var/run/*',
-            '/proc/*',
-            '/sys/*',
-            '*.bak',
-            '/var/cache/man/*',
-            '/var/cache/apt/archives/*',
-            '/var/cache/yum/*',
-            'lost+found/',
-            '*~',
-            '/var/lib/docker/aufs/*',
-            '/var/lib/docker/builder/*',
-            '/var/lib/docker/containers/*',
-            '/var/lib/docker/devicemapper/*',
-            '/var/lib/docker/image/*',
-            '/var/lib/docker/network/*',
-            '/var/lib/docker/overlay/*',
-            '/var/lib/docker/overlay2/*',
-            '/var/lib/docker/plugins/*',
-            '/var/lib/docker/repositories-aufs/*',
-            '/var/lib/docker/swarm/*',
-            '/var/lib/docker/tmp/*',
-            '/var/lib/docker/trust/*'
+            "/dev/*",
+            "/tmp/*",
+            "/var/tmp/*",
+            "/run/*",
+            "/var/run/*",
+            "/proc/*",
+            "/sys/*",
+            "*.bak",
+            "/var/cache/man/*",
+            "/var/cache/apt/archives/*",
+            "/var/cache/yum/*",
+            "lost+found/",
+            "*~",
+            "/var/lib/docker/aufs/*",
+            "/var/lib/docker/builder/*",
+            "/var/lib/docker/containers/*",
+            "/var/lib/docker/devicemapper/*",
+            "/var/lib/docker/image/*",
+            "/var/lib/docker/network/*",
+            "/var/lib/docker/overlay/*",
+            "/var/lib/docker/overlay2/*",
+            "/var/lib/docker/plugins/*",
+            "/var/lib/docker/repositories-aufs/*",
+            "/var/lib/docker/swarm/*",
+            "/var/lib/docker/tmp/*",
+            "/var/lib/docker/trust/*"
         ]
         self._engine = engine
         Base.metadata.create_all(engine)
@@ -93,48 +93,34 @@ class Dirvish:
         :rtype: bool
         """
         root_dir = os.path.dirname(os.path.abspath(__file__))
-        config_path_j2 = os.path.join(root_dir, 'dirvish.conf.j2')
-        config_root = os.path.join(
-            root,
-            customer,
-            vault,
-            'dirvish',
-        )
-        config_path = os.path.join(
-            config_root,
-            'default.conf',
-        )
+        config_path_j2 = os.path.join(root_dir, "dirvish.conf.j2")
+        config_root = os.path.join(root, customer, vault, "dirvish")
+        config_path = os.path.join(config_root, "default.conf")
         if excludes is None:
             excludes = self._excludes_default
         try:
-            with open(config_path_j2, 'r') as conf_jinja:
+            with open(config_path_j2, "r") as conf_jinja:
                 os.makedirs(config_root, mode=0o755, exist_ok=True)
-                with open(config_path, 'w') as conf:
+                with open(config_path, "w") as conf:
                     content = conf_jinja.read()
-                    content_rendered = jinja2.Environment().from_string(
-                        content,
-                    ).render(
-                        client=client,
-                        excludes=excludes,
+                    content_rendered = (
+                        jinja2.Environment()
+                        .from_string(content)
+                        .render(client=client, excludes=excludes)
                     )
-                    conf.write(
-                        content_rendered,
-                    )
+                    conf.write(content_rendered)
         except FileNotFoundError as e:
-            logger.error("couldn't open configuration file {0}: {1}".format(
-                config_path,
-                e,
-            ))
+            logger.error(
+                "couldn't open configuration file {0}: {1}".format(config_path, e)
+            )
         print(
-            'You should now edit the dirvish configuration and run an '
-            'initial backup.\n'
-            '$EDITOR {0}/{1}/{2}/dirvish/default.conf\n'
-            'dirvish --vault {1}/{2} --init\n\n'
-            'Please add the backup Job to /etc/crontab:\n'
-            'XX YY   *  *  *    root    dirvish --vault {1}/{2}\n'.format(
-                root,
-                customer,
-                vault,
+            "You should now edit the dirvish configuration and run an "
+            "initial backup.\n"
+            "$EDITOR {0}/{1}/{2}/dirvish/default.conf\n"
+            "dirvish --vault {1}/{2} --init\n\n"
+            "Please add the backup Job to /etc/crontab:\n"
+            "XX YY   *  *  *    root    dirvish --vault {1}/{2}\n".format(
+                root, customer, vault
             )
         )
         return True
@@ -151,10 +137,11 @@ class Dirvish:
         db_session = sessionmaker(bind=self._engine)
         session = db_session()
 
-        machine = session.query(MachineEntry).filter_by(
-            dirvish_client=dirvish_client,
-            dirvish_server=dirvish_server,
-        ).first()
+        machine = (
+            session.query(MachineEntry)
+            .filter_by(dirvish_client=dirvish_client, dirvish_server=dirvish_server)
+            .first()
+        )
         if not machine:
             machine = MachineEntry(
                 dirvish_client=dirvish_client,
@@ -170,19 +157,14 @@ class Dirvish:
 
         This function should be triggered by dirvish pre-server.
         """
-        dirvish_server = os.environ.get('DIRVISH_SERVER', None)
-        dirvish_client = os.environ.get('DIRVISH_CLIENT', None)
+        dirvish_server = os.environ.get("DIRVISH_SERVER", None)
+        dirvish_client = os.environ.get("DIRVISH_CLIENT", None)
         # dirvish_image  = os.environ.get('DIRVISH_IMAGE', None)
 
-        machine = self.create_machine(
-            dirvish_server,
-            dirvish_client,
-        )
+        machine = self.create_machine(dirvish_server, dirvish_client)
 
         new_entry = DirvishEntry(
-            datetime=datetime.now(),
-            machine=machine.id,
-            trigger='start',
+            datetime=datetime.now(), machine=machine.id, trigger="start"
         )
 
         db_session = sessionmaker(bind=self._engine)
@@ -195,20 +177,17 @@ class Dirvish:
 
         This function should be triggered by dirvish post-server.
         """
-        dirvish_server = os.environ.get('DIRVISH_SERVER', None)
-        dirvish_client = os.environ.get('DIRVISH_CLIENT', None)
+        dirvish_server = os.environ.get("DIRVISH_SERVER", None)
+        dirvish_client = os.environ.get("DIRVISH_CLIENT", None)
         # dirvish_image  = os.environ.get('DIRVISH_IMAGE', None)
-        dirvish_status = os.environ.get('DIRVISH_STATUS', None)
+        dirvish_status = os.environ.get("DIRVISH_STATUS", None)
 
-        machine = self.create_machine(
-            dirvish_server,
-            dirvish_client,
-        )
+        machine = self.create_machine(dirvish_server, dirvish_client)
 
         new_entry = DirvishEntry(
             datetime=datetime.now(),
             machine=machine.id,
-            trigger='end',
+            trigger="end",
             status=dirvish_status,
         )
 
