@@ -21,38 +21,24 @@ def new_filesystem(fs, path, size=None, compression=True):
     :rtype: bool
     """
     if compression:
-        compression = 'compression=on'
+        compression = "compression=on"
     else:
-        compression = 'compression=off'
+        compression = "compression=off"
     if size is not None:
-        size = ['-o', 'quota={0}'.format(size)]
+        size = ["-o", "quota={0}".format(size)]
     else:
         size = []
 
     returncode, stdout, stderr = execute_cmd(
-        [
-            'zfs',
-            'create',
-            '-o',
-            compression,
-            '-o',
-            'dedup=off',
-        ] + size + [
-            '-o',
-            'mountpoint={0}'.format(path),
-            '{0}'.format(fs),
-        ]
+        ["zfs", "create", "-o", compression, "-o", "dedup=off"]
+        + size
+        + ["-o", "mountpoint={0}".format(path), "{0}".format(fs)]
     )
     if returncode == 0:
-        logger.info('created zfs file system "{0}" successfully'.format(
-            fs,
-        ))
+        logger.info('created zfs file system "{0}" successfully'.format(fs))
         return True
     else:
-        logger.error('create zfs file system "{0}" failed: {1}'.format(
-            fs,
-            stderr,
-        ))
+        logger.error('create zfs file system "{0}" failed: {1}'.format(fs, stderr))
         return False
 
 
@@ -65,35 +51,25 @@ def resize_filesystem(fs, size):
     :returns: True if the quota was set correctly, else False.
     :rtype: bool
     """
-    if size.lower() != 'none':
+    if size.lower() != "none":
         usage = filesystem_usage(fs)
         if usage > parse_size(size):
             logger.warn(
-                "new size ({0}) is smaller than used size ({1})".format(
-                    size,
-                    usage,
-                ),
+                "new size ({0}) is smaller than used size ({1})".format(size, usage)
             )
             return False
-    returncode, stdout, stderr = execute_cmd([
-        'zfs',
-        'set',
-        'quota={0}'.format(size),
-        '{0}'.format(fs),
-    ])
+    returncode, stdout, stderr = execute_cmd(
+        ["zfs", "set", "quota={0}".format(size), "{0}".format(fs)]
+    )
     if returncode == 0:
         logger.info(
-            'set zfs file system quota for "{0}" to {1} successfully'.format(
-                fs,
-                size,
-            )
+            'set zfs file system quota for "{0}" to {1} successfully'.format(fs, size)
         )
         return True
     else:
-        logger.error('set zfs file system quota for "{0}" failed: {1}'.format(
-            fs,
-            stderr,
-        ))
+        logger.error(
+            'set zfs file system quota for "{0}" failed: {1}'.format(fs, stderr)
+        )
         return False
 
 
@@ -106,29 +82,15 @@ def remove_filesystem(fs):
     :returns: True if the file system was removed correctly, else False.
     :rtype: bool
     """
-    execute_cmd([
-        'zfs',
-        'set',
-        'mountpoint=none',
-        '{0}'.format(fs),
-    ])
-    returncode, stdout, stderr = execute_cmd([
-        'zfs',
-        'destroy',
-        '-r',
-        '-f',
-        '{0}'.format(fs),
-    ])
+    execute_cmd(["zfs", "set", "mountpoint=none", "{0}".format(fs)])
+    returncode, stdout, stderr = execute_cmd(
+        ["zfs", "destroy", "-r", "-f", "{0}".format(fs)]
+    )
     if returncode == 0:
-        logger.info('destroyed zfs file system "{0}" successfully'.format(
-            fs,
-        ))
+        logger.info('destroyed zfs file system "{0}" successfully'.format(fs))
         return True
     else:
-        logger.error('destroy zfs file system "{0}" failed: {1}'.format(
-            fs,
-            stderr,
-        ))
+        logger.error('destroy zfs file system "{0}" failed: {1}'.format(fs, stderr))
         return False
 
 
@@ -140,34 +102,19 @@ def filesystem_usage(fs):
     :returns: Number of used bytes or None if an error occured.
     :rtype: int
     """
-    returncode, stdout, stderr = execute_cmd([
-        'zfs',
-        'get',
-        '-H',
-        '-o',
-        'value',
-        '-p',
-        'used',
-        '{0}'.format(fs),
-    ])
+    returncode, stdout, stderr = execute_cmd(
+        ["zfs", "get", "-H", "-o", "value", "-p", "used", "{0}".format(fs)]
+    )
     try:
         usage = int(stdout)
     except ValueError as e:
-        logger.error('zfs returned not an integer as usage for "{0}"'.format(
-            fs,
-        ))
+        logger.error('zfs returned not an integer as usage for "{0}"'.format(fs))
         return None
     if returncode == 0:
-        logger.info('file system "{0}" use {1}B data'.format(
-            fs,
-            usage,
-        ))
+        logger.info('file system "{0}" use {1}B data'.format(fs, usage))
         return usage
     else:
-        logger.error('destroy zfs file system "{0}" failed: {1}'.format(
-            fs,
-            stderr,
-        ))
+        logger.error('destroy zfs file system "{0}" failed: {1}'.format(fs, stderr))
         return None
 
 
@@ -182,12 +129,10 @@ def parse_size(size):
 
     :raises ValueError: If size couldn't be interpreted.
     """
-    SYMBOLS = {
-        'customary': ('B', 'K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y'),
-    }
+    SYMBOLS = {"customary": ("B", "K", "M", "G", "T", "P", "E", "Z", "Y")}
     init = size
     num = ""
-    while size and size[0:1].isdigit() or size[0:1] == '.':
+    while size and size[0:1].isdigit() or size[0:1] == ".":
         num += size[0]
         size = size[1:]
     num = float(num)
@@ -196,9 +141,9 @@ def parse_size(size):
         if letter in sset:
             break
     else:
-        if letter == 'k':
+        if letter == "k":
             # treat 'k' as an alias for 'K' as per: http://goo.gl/kTQMs
-            sset = SYMBOLS['customary']
+            sset = SYMBOLS["customary"]
             letter = letter.upper()
         else:
             raise ValueError("can't interpret %r" % init)
@@ -208,7 +153,7 @@ def parse_size(size):
     return int(num * prefix[letter])
 
 
-def execute_cmd(command, stdin='', communicate=True):
+def execute_cmd(command, stdin="", communicate=True):
     """Executes the given command (which should be a list).
 
     If you pass stdin, it will be written to the command's stdin.
@@ -227,13 +172,10 @@ def execute_cmd(command, stdin='', communicate=True):
     returncode = 0
     is_shell = isinstance(command, str)
     proc = subprocess.Popen(
-        command,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        shell=is_shell
+        command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=is_shell
     )
     if communicate:
         (stdout, stderr) = proc.communicate(stdin)
         returncode = proc.wait()
-        return (returncode, stdout.decode('utf8'), stderr.decode('utf8'))
+        return (returncode, stdout.decode("utf8"), stderr.decode("utf8"))
     return (None, None, None)

@@ -10,54 +10,32 @@ import sqlalchemy
 
 from backupctl import history
 
-BACKUPCTL_DB = os.path.join(
-    os.sep,
-    'tmp',
-    'backupctl',
-    'backupctl.db',
-)
+BACKUPCTL_DB = os.path.join(os.sep, "tmp", "backupctl", "backupctl.db")
 
 
 @pytest.fixture()
 def hist():
     if not os.path.exists(os.path.dirname(BACKUPCTL_DB)):
         os.makedirs(os.path.dirname(BACKUPCTL_DB))
-    engine = sqlalchemy.create_engine('sqlite:///{0}'.format(BACKUPCTL_DB))
+    engine = sqlalchemy.create_engine("sqlite:///{0}".format(BACKUPCTL_DB))
     hist_obj = history.History(engine)
     return hist_obj
 
 
 def test_add_customer(hist):
-    assert hist.add(
-        customer='customer1',
-        size='10G',
-        command='test',
-    )
+    assert hist.add(customer="customer1", size="10G", command="test")
 
 
 def test_add_vault(hist):
     assert hist.add(
-        customer='customer1',
-        vault='www.example.com',
-        size='10G',
-        command='test',
+        customer="customer1", vault="www.example.com", size="10G", command="test"
     )
 
 
 def test_show_one(hist):
-    hist.add(
-        customer='customer1',
-        size='10G',
-        command='test',
-    )
-    hist.add(
-        customer='customer2',
-        size='20G',
-        command='test',
-    )
-    tdata = hist.show(
-        count=1
-    )
+    hist.add(customer="customer1", size="10G", command="test")
+    hist.add(customer="customer2", size="20G", command="test")
+    tdata = hist.show(count=1)
     assert type(tdata) == list
     assert len(tdata) == 1
 
