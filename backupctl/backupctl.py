@@ -36,6 +36,7 @@ def main():
         All subcommands that modify zfs file system and dirvish configurations.
         See the manpage (man 8 backupctl) for more inforation.
         """,
+        choices=["new", "resize", "remove", "log"]
     )
     parser.add_argument(
         "-v",

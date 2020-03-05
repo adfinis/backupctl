@@ -122,7 +122,7 @@ The following exit values are returned:
   An error occurred.
 
 2
-  No command was given.
+  No command or an invalid command was given.
 
 
 FILES
