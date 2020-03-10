@@ -70,7 +70,7 @@ def mock_zfs(mocker):
         (["remove", "-n", "customer1"], 0),
         (["remove", "-n", "customer1", "-v", "www.example.com"], 0),
         (["log"], 0),
-        (["test"], 1),
+        (["test"], 2),
     ],
 )
 def test_main(parameters, exit_code, mocker, mock_zfs):
