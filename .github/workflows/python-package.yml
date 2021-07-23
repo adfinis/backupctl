@@ -31,7 +31,7 @@ jobs:
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: create configgile
       run: |
-        cp -v .travis/backupctl.ini backupctl.ini
+        cp -v .github/backupctl.ini backupctl.ini
     - name: Test with pytest
       run: |
         pytest
