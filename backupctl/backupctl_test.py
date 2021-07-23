@@ -133,11 +133,12 @@ def test_customer(mock_zfs, ohistory, odirvish):
             "-o",
             "quota=1G",
             "-o",
-            "mountpoint=none"
+            "mountpoint=none",
             "backup/customer1",
         ],
         ["zfs", "get", "-H", "-o", "value", "-p", "used", "backup/customer1"],
         ["zfs", "set", "quota=2G", "backup/customer1"],
+        ["zfs", "set", "mountpoint=none", "backup/customer1"],
         ["zfs", "destroy", "-r", "-f", "backup/customer1"],
     ]
 
@@ -194,9 +195,7 @@ def test_vault(mock_zfs, ohistory, odirvish):
             "-o",
             "quota=1G",
             "-o",
-            "mountpoint={0}".format(
-                os.path.join(os.sep, "tmp", "backupctl", "backup", "customer1")
-            ),
+            "mountpoint=none",
             "backup/customer1",
         ],
         [
