@@ -251,7 +251,7 @@ def new(hist, dirvish, pool, root, customer, vault=None, size=None, client=None)
         path = os.path.join(root, customer, vault)
     else:
         fs = os.path.join(pool, customer)
-        path = os.path.join(root, customer)
+        path = None
     fs_status = zfs.new_filesystem(fs, path, size)
     if fs_status:
         hist.add(customer, "create", vault, size)
