@@ -13,6 +13,7 @@ from xdg import BaseDirectory
 from backupctl import zfs
 from backupctl.dirvish import Dirvish
 from backupctl.history import History
+from backupctl.version import __version__
 
 LOG = logging.getLogger(__name__)
 LOG.addHandler(logging.StreamHandler())
@@ -74,6 +75,14 @@ def main():
         help="""\
         Quota of a customer or a vault. Size can be written human readable as
         MB, GB and so on.
+        """,
+    )
+    parser.add_argument(
+        "--version",
+        action="version",
+        version="Backupctl v{0}".format(__version__),
+        help="""\
+        Displays the backupctl version
         """,
     )
     args = parser.parse_args()
