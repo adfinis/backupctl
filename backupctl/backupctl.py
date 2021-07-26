@@ -77,10 +77,9 @@ def main():
         """,
     )
     parser.add_argument(
-        "-v",
         "--version",
-        required=False,
-        default=None,
+        action="version",
+        version="Backupctl v{0}".format(__version__),
         help="""\
         Displays the backupctl version
         """,
@@ -151,9 +150,6 @@ def main():
             sys.exit(1)
     elif args.command == "log":
         history_show(hist)
-    elif args.command == "version":
-        LOG.info("Backupctl version: v{0}".format(__version__)
-        sys.exit(0)
     else:
         sys.exit(1)
     sys.exit(0)
