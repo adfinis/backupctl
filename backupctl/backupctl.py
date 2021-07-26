@@ -13,6 +13,7 @@ from xdg import BaseDirectory
 from backupctl import zfs
 from backupctl.dirvish import Dirvish
 from backupctl.history import History
+from backupctl.version import __version__
 
 LOG = logging.getLogger(__name__)
 LOG.addHandler(logging.StreamHandler())
