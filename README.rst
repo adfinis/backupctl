@@ -149,6 +149,12 @@ SEE ALSO
 * `backupctl(8)`_, backupctl man page
 * `backupctl.ini(5)`_, backupctl configuration file
 
+DEVELOPMENT
+=========
+
+We use git pre-commit hooks to ease up some best practices.
+To install the pre-commit hooks into the git repository, execute `pre-commit install`
+
 
 Copyright
 ==========

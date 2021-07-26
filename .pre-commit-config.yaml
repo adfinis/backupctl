@@ -1,0 +1,15 @@
+---
+
+repos:
+  - repo: local
+    hooks:
+      - id: isort
+        name: isort
+        entry: isort
+        language: system
+        types: [python]
+      - id: yamllint
+        name: yamllint
+        entry: yamllint -c .yamllint
+        language: system
+        types: [yaml]
