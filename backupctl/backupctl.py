@@ -301,6 +301,7 @@ def remove(hist, pool, customer, vault=None):
     else:
         fs = os.path.join(pool, customer)
     zfs.remove_filesystem(fs)
+    os.rmdir(fs)
     hist.add(customer, "remove", vault)
 
 
