@@ -1,0 +1,61 @@
+# This workflow will install Python dependencies, run tests, lint with a variety of Python versions and build the RPM package
+
+name: Github Actions
+
+on:
+  push:
+    branches: [ master,add_rpm_action ]
+  pull_request:
+    branches: [ master,add_rpm_action ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [3]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install pytest pytest-mock
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+    - name: create configfile
+      run: |
+        cp -v .github/backupctl.ini backupctl.ini
+    - name: Test with pytest
+      run: pytest
+    - name: Install docutils to generate the documentation
+      run: python -m pip install docutils
+    - name: generate documentation
+      run: |
+        rst2man.py backupctl.8.rst > backupctl.8
+        rst2man.py backupctl.ini.5.rst > backupctl.ini.5
+    - name: compress documentation
+      run: |
+        gzip -c backupctl.8 > backupctl.8.gz
+        gzip -c backupctl.ini.5 > backupctl.ini.5.gz
+    - name: Build binary wheel and a source tarball
+      run: python setup.py build
+    - name: install package to buildroot
+      run: python setup.py install -O1 --skip-build --home target
+    - name: Create rpm package
+      uses: blinktag/nfpm@v2.3.1
+      id: rpm-package
+      with:
+        config: "nfpm.yaml"
+        packager: "rpm"
+    - name: upload artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: backupctl-artifact
+        path: backupctl-*.noarch.rpm
+
