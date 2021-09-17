@@ -12,7 +12,7 @@ platform: linux
 
 # Version. (required)
 # This will expand any env var you set in the field, eg version: v${SEMVER}
-version: v2.0.4
+version: v${BACKUPCTL_VERSION}
 
 # Section.
 section: default
