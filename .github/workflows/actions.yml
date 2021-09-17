@@ -42,7 +42,7 @@ jobs:
       - name: replace version in files
         run: |
           for file in backupctl/version.py backupctl.spec backupctl.8.rst; do
-            sed -i 's/\$\{BACKUPCTL_VERSION\}/$BACKUPCTL_VERSION/g' "$file"
+            sed -i -r "s/\\$\\{BACKUPCTL_VERSION\\}/$BACKUPCTL_VERSION/g" "$file"
           done
       - name: generate documentation
         run: |
