@@ -41,7 +41,7 @@ jobs:
         run: python -m pip install docutils
       - name: replace version in files
         run: |
-          for file in backupctl/version.py backupctl.spec backupctl.8.rst backupctl.ini.5.rst; do
+          for file in backupctl/version.py backupctl.spec backupctl.8.rst backupctl.ini.5.rst nfpm.yaml; do
             sed -i -r "s/\\$\\{BACKUPCTL_VERSION\\}/$BACKUPCTL_VERSION/g" "$file"
           done
       - name: generate documentation
