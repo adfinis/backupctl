@@ -18,6 +18,8 @@ jobs:
       fail-fast: false
       matrix:
         python-version: [3.4,3.5,3.6,3.7]
+    env:
+      PYTHONPATH: "target"
 
     steps:
       - uses: actions/checkout@v2
@@ -56,6 +58,8 @@ jobs:
           gzip -c backupctl.ini.5 > backupctl.ini.5.gz
       - name: Build binary wheel and a source tarball
         run: python setup.py build
+      - name: install package to buildroot
+        run: python setup.py install -O1 --skip-build --home target
       - name: Create rpm package
         uses: blinktag/nfpm@v2.3.1
         id: rpm-package
