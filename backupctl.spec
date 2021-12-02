@@ -1,7 +1,7 @@
 %define __python /usr/bin/python3
 
 Name:           backupctl
-Version:        ${BACKUPCTL_VERSION}
+Version:        2.0.5
 Release:        2%{?dist}
 Summary:        Tool to manage zfs volumes and create new dirvish vault configurations.
 License:        GPLv3

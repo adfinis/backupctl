@@ -3,4 +3,4 @@
 
 """Version."""
 
-__version__ = "${BACKUPCTL_VERSION}"
+__version__ = "2.0.5"
