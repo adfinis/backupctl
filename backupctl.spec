@@ -9,8 +9,8 @@ License:        GPLv3
 Source0:        https://github.com/adfinis-sygroup/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 BuildArch:      noarch
 
-BuildRequires:  python34, python34-setuptools, python34-docutils, tar, gzip
-Requires:       python34-jinja2, python34-setuptools, python34-pyxdg, python34-sqlalchemy, dirvish, zfs
+BuildRequires:  python36, python36-setuptools, python36-docutils, tar, gzip
+Requires:       python36-jinja2, python36-setuptools, python36-pyxdg, python36-sqlalchemy, dirvish, zfs
 
 %description
 Tool to manage zfs volumes and create new dirvish vault configurations.
