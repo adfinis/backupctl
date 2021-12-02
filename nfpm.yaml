@@ -52,7 +52,7 @@ contents:
   - src: target/usr/lib/python3.6/site-packages/backupctl/
     dst: usr/lib/python3.6/site-packages/backupctl/
   - src: target/usr/lib/python3.6/site-packages/backupctl-*-py3*.egg-info
-    dst: /usr/lib/python3/site-packages/
+    dst: "/usr/lib/python3.6/site-packages/"
   - src: target/usr/bin/backupctl
     dst: /usr/bin/backupctl
   - src: target/usr/bin/backupctl-start
