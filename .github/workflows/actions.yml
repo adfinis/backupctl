@@ -36,7 +36,7 @@ jobs:
       - name: Test with pytest
         run: pytest
       - name: Install docutils to generate the documentation
-        run: python -m pip install docutils build
+        run: python -m pip install docutils setuptools
       - name: Set variables
         run: |
           VER=$(cat version)
@@ -54,10 +54,8 @@ jobs:
         run: |
           gzip -c backupctl.8 > backupctl.8.gz
           gzip -c backupctl.ini.5 > backupctl.ini.5.gz
-      - name: Build binary wheel and a source tarball
-        run: python -m build
       - name: install package to buildroot
-        run: python setup.py install --skip-build --root target
+        run: python setup.py egg_info install --root target --prefix=/usr
       - name: Create rpm package
         uses: blinktag/nfpm@v2.3.1
         id: rpm-package
