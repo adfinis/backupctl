@@ -41,21 +41,23 @@ disable_globbing: false
 
 # Dependencies. (overridable)
 depends:
-  - python34-jinja2
-  - python34-setuptools
-  - python34-pyxdg
-  - python34-sqlalchemy
+  - python36-jinja2
+  - python36-setuptools
+  - python36-pyxdg
+  - python36-sqlalchemy
   - dirvish
   - zfs
 
 contents:
-  - src: target/lib/python/backupctl-*-py3*.egg/backupctl
-    dst: /usr/lib/python3/site-packages/backupctl/
-  - src: target/bin/backupctl
+  - src: target/usr/lib/python3.6/site-packages/backupctl/
+    dst: usr/lib/python3.6/site-packages/backupctl/
+  - src: target/usr/lib/python3.6/site-packages/backupctl-*-py3*.egg-info
+    dst: /usr/lib/python3/site-packages/
+  - src: target/usr/bin/backupctl
     dst: /usr/bin/backupctl
-  - src: target/bin/backupctl-start
+  - src: target/usr/bin/backupctl-start
     dst: /usr/bin/backupctl-start
-  - src: target/bin/backupctl-stop
+  - src: target/usr/bin/backupctl-stop
     dst: /usr/bin/backupctl-stop
   - src: backupctl.ini.example
     dst: /etc/backupctl.ini
